@@ -5,12 +5,13 @@ import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
 import android.preference.PreferenceManager
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
 import de.tum.`in`.tumcampusapp.R
 import de.tum.`in`.tumcampusapp.component.other.navigation.NavigationDestination
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.utils.Const.CARD_POSITION_PREFERENCE_SUFFIX
 import de.tum.`in`.tumcampusapp.utils.Const.DISCARD_SETTINGS_START
 import de.tum.`in`.tumcampusapp.utils.Utils
+import org.jetbrains.anko.defaultSharedPreferences
 
 /**
  * Base class for all cards
@@ -24,8 +25,12 @@ abstract class Card(
         val settingsPrefix: String = ""
 ) : Comparable<Card> {
 
+    protected val appConfig: AppConfig by lazy {
+        AppConfig(context.defaultSharedPreferences)
+    }
+
     // Settings for showing this card on start page or as notification
-    private var showStart = Utils.getSettingBool(context, settingsPrefix + "_start", true)
+    private var showStart = appConfig.showCardOnHome(settingsPrefix)
 
     open fun getId(): Int {
         return 0
@@ -45,10 +50,8 @@ abstract class Card(
         get() = R.menu.card_popup_menu_no_settings
 
     open var position: Int
-        get()  =
-            Utils.getSettingInt(context, "${this.javaClass.simpleName}$CARD_POSITION_PREFERENCE_SUFFIX", -1)
-        set(position) =
-            Utils.setSetting(context, "${this.javaClass.simpleName}$CARD_POSITION_PREFERENCE_SUFFIX", position)
+        get() = appConfig.cardPosition(javaClass)
+        set(value) = appConfig.setCardPosition(javaClass, value)
 
     /**
      * Returns the [NavigationDestination] when the card is clicked, or null if nothing should happen

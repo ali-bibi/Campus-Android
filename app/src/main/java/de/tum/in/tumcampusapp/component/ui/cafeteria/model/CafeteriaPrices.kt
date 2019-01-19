@@ -1,8 +1,10 @@
 package de.tum.`in`.tumcampusapp.component.ui.cafeteria.model
 
 import android.content.Context
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.Utils
+import org.jetbrains.anko.defaultSharedPreferences
 
 /**
  * Hardcoded cafeteria prices
@@ -128,7 +130,8 @@ object CafeteriaPrices {
      */
     @JvmStatic
     fun getRolePrices(context: Context): Map<String, String> {
-        val type = Utils.getSetting(context, Const.ROLE, "")
+        val appConfig = AppConfig(context.defaultSharedPreferences)
+        val type = appConfig.role
         return when (type) {
             "0" -> STUDENT_PRICES
             "1" -> EMPLOYEE_PRICES

@@ -94,14 +94,20 @@ public class WizNavExtrasActivity extends ActivityForLoadingInBackground<Void, C
         // by now we should have generated rsa key and uploaded it to our server and tumonline
 
         // Get the users lrzId and initialise chat member
-        String lrzId = Utils.getSetting(this, Const.LRZ_ID, "");
-        String name = Utils.getSetting(this,
-                Const.CHAT_ROOM_DISPLAY_NAME, getString(R.string.not_connected_to_tumonline));
+        String lrzId = getAppConfig().getLrzId();
+        if (lrzId == null) {
+            lrzId = getString(R.string.not_connected_to_tumonline);
+        }
+
+        String name = getAppConfig().getChatRoomDisplayName();
+        if (name == null) {
+            name = getString(R.string.not_connected_to_tumonline);
+        }
 
         ChatMember currentChatMember = new ChatMember(lrzId);
         currentChatMember.setDisplayName(name);
 
-        if (currentChatMember.getLrzId().equals("")) {
+        if (lrzId.equals("")) {
             return currentChatMember;
         }
 
@@ -136,7 +142,7 @@ public class WizNavExtrasActivity extends ActivityForLoadingInBackground<Void, C
 
             // upload obfuscated ids now that we have a member
             UploadStatus uploadStatus = TUMCabeClient.getInstance(this)
-                    .getUploadStatus(Utils.getSetting(this, Const.LRZ_ID, ""));
+                    .getUploadStatus(getAppConfig().getLrzId());
             if (uploadStatus != null) {
                 new AuthenticationManager(this).uploadObfuscatedIds(uploadStatus);
             }
@@ -162,11 +168,10 @@ public class WizNavExtrasActivity extends ActivityForLoadingInBackground<Void, C
         editor.putBoolean(Const.BACKGROUND_MODE, true); // Enable by default
         editor.putBoolean(Const.BUG_REPORTS, bugReport.isChecked());
 
-        if (!member.getLrzId()
-                   .equals("")) {
-            Utils.setSetting(this, Const.GROUP_CHAT_ENABLED, groupChatMode.isChecked());
-            Utils.setSetting(this, Const.AUTO_JOIN_NEW_ROOMS, groupChatMode.isChecked());
-            Utils.setSetting(this, Const.CHAT_MEMBER, member);
+        if (member.getLrzId() != null && !member.getLrzId().equals("")) {
+            getAppConfig().setChatEnabled(groupChatMode.isChecked());
+            getAppConfig().setAutoJoinChatRooms(groupChatMode.isChecked());
+            getAppConfig().setChatMember(member);
         }
         editor.apply();
 

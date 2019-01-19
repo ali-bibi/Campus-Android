@@ -35,7 +35,6 @@ import de.tum.in.tumcampusapp.service.DownloadService;
 import de.tum.in.tumcampusapp.service.SilenceService;
 import de.tum.in.tumcampusapp.utils.Const;
 import de.tum.in.tumcampusapp.utils.NetUtils;
-import de.tum.in.tumcampusapp.utils.Utils;
 
 /**
  * Main activity displaying the cards and providing navigation with navigation drawer
@@ -155,9 +154,9 @@ public class MainActivity extends BaseActivity
     protected void onResume() {
         super.onResume();
 
-        if (Utils.getSettingBool(this, Const.REFRESH_CARDS, false)) {
+        if (getAppConfig().getRefreshCards()) {
             refreshCards();
-            Utils.setSetting(this, Const.REFRESH_CARDS, false);
+            getAppConfig().setRefreshCards(false);
         }
     }
 

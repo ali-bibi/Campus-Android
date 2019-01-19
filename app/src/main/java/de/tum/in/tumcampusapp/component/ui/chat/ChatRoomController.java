@@ -1,6 +1,8 @@
 package de.tum.in.tumcampusapp.component.ui.chat;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -16,6 +18,7 @@ import de.tum.in.tumcampusapp.api.app.TUMCabeClient;
 import de.tum.in.tumcampusapp.api.app.model.TUMCabeVerification;
 import de.tum.in.tumcampusapp.api.tumonline.CacheControl;
 import de.tum.in.tumcampusapp.api.tumonline.TUMOnlineClient;
+import de.tum.in.tumcampusapp.component.prefs.AppConfig;
 import de.tum.in.tumcampusapp.component.tumui.lectures.model.Lecture;
 import de.tum.in.tumcampusapp.component.tumui.lectures.model.LecturesResponse;
 import de.tum.in.tumcampusapp.component.ui.chat.model.ChatRoom;
@@ -24,7 +27,6 @@ import de.tum.in.tumcampusapp.component.ui.chat.model.ChatRoomDbRow;
 import de.tum.in.tumcampusapp.component.ui.overview.card.Card;
 import de.tum.in.tumcampusapp.component.ui.overview.card.ProvidesCard;
 import de.tum.in.tumcampusapp.database.TcaDb;
-import de.tum.in.tumcampusapp.utils.Const;
 import de.tum.in.tumcampusapp.utils.Utils;
 import retrofit2.Response;
 
@@ -35,6 +37,7 @@ public class ChatRoomController implements ProvidesCard {
 
     private Context mContext;
     private final ChatRoomDao chatRoomDao;
+    private AppConfig appConfig;
 
     /**
      * Constructor, open/create database, create table if necessary
@@ -43,8 +46,12 @@ public class ChatRoomController implements ProvidesCard {
      */
     public ChatRoomController(Context context) {
         mContext = context;
+
         TcaDb db = TcaDb.getInstance(context);
         chatRoomDao = db.chatRoomDao();
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        appConfig = new AppConfig(sharedPrefs);
     }
 
     /**
@@ -137,7 +144,7 @@ public class ChatRoomController implements ProvidesCard {
             }
 
             // Join all new chat rooms
-            if (Utils.getSettingBool(mContext, Const.AUTO_JOIN_NEW_ROOMS, false)) {
+            if (appConfig.getAutoJoinChatRooms()) {
                 TUMCabeClient client = TUMCabeClient.getInstance(mContext);
                 List<String> newRooms = this.getNewUnjoined();
 

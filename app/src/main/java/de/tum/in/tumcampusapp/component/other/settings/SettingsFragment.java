@@ -30,6 +30,7 @@ import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreferenceCompat;
 import de.tum.in.tumcampusapp.R;
 import de.tum.in.tumcampusapp.api.tumonline.AccessTokenManager;
+import de.tum.in.tumcampusapp.component.prefs.AppConfig;
 import de.tum.in.tumcampusapp.component.tumui.calendar.CalendarController;
 import de.tum.in.tumcampusapp.component.ui.eduroam.SetupEduroamActivity;
 import de.tum.in.tumcampusapp.component.ui.news.NewsController;
@@ -39,22 +40,25 @@ import de.tum.in.tumcampusapp.database.TcaDb;
 import de.tum.in.tumcampusapp.service.BackgroundService;
 import de.tum.in.tumcampusapp.service.SilenceService;
 import de.tum.in.tumcampusapp.utils.Const;
-import de.tum.in.tumcampusapp.utils.Utils;
 
 public class SettingsFragment extends PreferenceFragmentCompat
         implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener {
 
-    public static final String FRAGMENT_TAG = "my_preference_fragment";
+    static final String FRAGMENT_TAG = "my_preference_fragment";
     private static final String BUTTON_LOGOUT = "button_logout";
     private static final String SETUP_EDUROAM = "card_eduroam_setup";
 
     private FragmentActivity mContext;
+    private AppConfig appConfig;
 
     @Override
     public void onCreatePreferences(Bundle bundle, String rootKey) {
         // Load the correct preference category
         setPreferencesFromResource(R.xml.settings, rootKey);
         mContext = getActivity();
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        appConfig = new AppConfig(sharedPrefs);
 
         populateNewsSources();
         setUpEmployeeSettings();
@@ -143,7 +147,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
      * Disable setting for non-employees.
      */
     private void setUpEmployeeSettings() {
-        boolean isEmployee = !Utils.getSetting(mContext, Const.TUMO_EMPLOYEE_ID, "").isEmpty();
+        boolean isEmployee = appConfig.getTumOnlineEmployeeId() != null;
         Preference checkbox = findPreference(Const.EMPLOYEE_MODE);
         if (!isEmployee && checkbox != null) {
             findPreference(Const.EMPLOYEE_MODE).setEnabled(false);
@@ -188,7 +192,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
                     if (silenceSwitch != null) {
                         silenceSwitch.setChecked(false);
                     }
-                    Utils.setSetting(mContext, Const.SILENCE_SERVICE, false);
+                    appConfig.setSilenceServiceActivated(false);
 
                     SilenceService.requestPermissions(mContext);
                 } else {
@@ -283,7 +287,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
                 requireActivity(), Manifest.permission.WRITE_CALENDAR);
 
         // Delete local calendar
-        Utils.setSetting(mContext, Const.SYNC_CALENDAR, false);
+        appConfig.setSyncCalendar(false);
         if (readCalendar == PackageManager.PERMISSION_GRANTED &&
                 writeCalendar == PackageManager.PERMISSION_GRANTED) {
             CalendarController.deleteLocalCalendar(mContext);

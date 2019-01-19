@@ -6,10 +6,11 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import de.tum.`in`.tumcampusapp.R
 import de.tum.`in`.tumcampusapp.api.tumonline.AccessTokenManager
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.ui.ticket.activity.BuyTicketActivity
 import de.tum.`in`.tumcampusapp.component.ui.ticket.model.Event
 import de.tum.`in`.tumcampusapp.utils.Const
-import de.tum.`in`.tumcampusapp.utils.Utils
+import org.jetbrains.anko.defaultSharedPreferences
 import org.joda.time.DateTime
 
 /**
@@ -18,22 +19,20 @@ import org.joda.time.DateTime
  */
 class EventHelper {
     companion object {
-        fun buyTicket(event: Event, buyButton: View, context: Context?) {
-            if (context == null) {
-                return
-            }
-
+        fun buyTicket(event: Event, buyButton: View, context: Context) {
             if (isEventImminent(event)) {
                 showEventImminentDialog(context)
                 buyButton.visibility = View.GONE
                 return
             }
 
-            val lrzId = Utils.getSetting(context, Const.LRZ_ID, "")
-            val chatRoomName = Utils.getSetting(context, Const.CHAT_ROOM_DISPLAY_NAME, "")
+            val appConfig = AppConfig(context.defaultSharedPreferences)
+
+            val lrzId = appConfig.lrzId
+            val chatRoomName = appConfig.chatRoomDisplayName
             val isLoggedIn = AccessTokenManager.hasValidAccessToken(context)
 
-            if (!isLoggedIn || lrzId.isEmpty() || chatRoomName.isEmpty()) {
+            if (!isLoggedIn || lrzId == null || chatRoomName == null) {
                 val dialog = AlertDialog.Builder(context)
                         .setTitle(R.string.error)
                         .setMessage(R.string.not_logged_in_error)

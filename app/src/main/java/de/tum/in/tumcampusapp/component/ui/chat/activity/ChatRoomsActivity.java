@@ -181,7 +181,7 @@ public class ChatRoomsActivity extends ActivityForAccessingTumOnline<LecturesRes
      */
     private void populateCurrentChatMember() {
         if (currentChatMember == null) {
-            currentChatMember = Utils.getSetting(this, Const.CHAT_MEMBER, ChatMember.class);
+            currentChatMember = getAppConfig().getChatMember();
         }
     }
 

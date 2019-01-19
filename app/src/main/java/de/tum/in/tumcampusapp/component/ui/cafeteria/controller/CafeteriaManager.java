@@ -1,6 +1,8 @@
 package de.tum.in.tumcampusapp.component.ui.cafeteria.controller;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
@@ -14,6 +16,7 @@ import androidx.annotation.Nullable;
 import de.tum.in.tumcampusapp.api.tumonline.CacheControl;
 import de.tum.in.tumcampusapp.component.notifications.ProvidesNotifications;
 import de.tum.in.tumcampusapp.component.other.locations.LocationManager;
+import de.tum.in.tumcampusapp.component.prefs.AppConfig;
 import de.tum.in.tumcampusapp.component.ui.cafeteria.CafeteriaMenuCard;
 import de.tum.in.tumcampusapp.component.ui.cafeteria.model.CafeteriaMenu;
 import de.tum.in.tumcampusapp.component.ui.cafeteria.model.CafeteriaWithMenus;
@@ -29,12 +32,18 @@ import de.tum.in.tumcampusapp.utils.Utils;
 public class CafeteriaManager implements ProvidesCard, ProvidesNotifications {
 
     private Context mContext;
+    private AppConfig appConfig;
     private final CafeteriaLocalRepository localRepository;
 
     public CafeteriaManager(Context context) {
         mContext = context;
+
         TcaDb db = TcaDb.getInstance(context);
         localRepository = new CafeteriaLocalRepository(db);
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        appConfig = new AppConfig(sharedPrefs);
+
     }
 
     @NotNull
@@ -56,7 +65,7 @@ public class CafeteriaManager implements ProvidesCard, ProvidesNotifications {
 
     @Override
     public boolean hasNotificationsEnabled() {
-        return Utils.getSettingBool(mContext, "card_cafeteria_phone", true);
+        return appConfig.getHasCafeteriaNotificationsEnabled();
     }
 
     @Nullable

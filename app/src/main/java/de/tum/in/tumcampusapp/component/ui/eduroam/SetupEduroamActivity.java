@@ -3,14 +3,15 @@ package de.tum.in.tumcampusapp.component.ui.eduroam;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
-import com.google.android.material.textfield.TextInputEditText;
-import androidx.appcompat.app.AlertDialog;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.material.textfield.TextInputEditText;
+
 import java.util.regex.Pattern;
 
+import androidx.appcompat.app.AlertDialog;
 import de.tum.in.tumcampusapp.R;
 import de.tum.in.tumcampusapp.component.other.generic.activity.BaseActivity;
 import de.tum.in.tumcampusapp.utils.Const;
@@ -41,7 +42,7 @@ public class SetupEduroamActivity extends BaseActivity {
         ((TextView) findViewById(R.id.text_with_link_2)).setMovementMethod(LinkMovementMethod.getInstance());
 
         lrz = findViewById(R.id.wifi_lrz_id);
-        lrz.setText(Utils.getSetting(this, Const.LRZ_ID, ""));
+        lrz.setText(getAppConfig().getLrzId());
         password = findViewById(R.id.wifi_password);
 
         //Set the focus for improved UX experience

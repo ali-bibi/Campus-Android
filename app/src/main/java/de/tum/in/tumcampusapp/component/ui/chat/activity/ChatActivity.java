@@ -104,7 +104,7 @@ public class ChatActivity extends ActivityForDownloadingExternal
     private void setupToolbarTitle() {
         String encodedChatRoom = getIntent().getStringExtra(Const.CURRENT_CHAT_ROOM);
         currentChatRoom = new Gson().fromJson(encodedChatRoom, ChatRoom.class);
-        currentChatMember = Utils.getSetting(this, Const.CHAT_MEMBER, ChatMember.class);
+        currentChatMember = getAppConfig().getChatMember();
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(currentChatRoom.getTitle());

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.tum.`in`.tumcampusapp.R
 import de.tum.`in`.tumcampusapp.component.other.generic.adapter.EqualSpacingItemDecoration
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.ui.chat.model.ChatMember
 import de.tum.`in`.tumcampusapp.component.ui.ticket.EventsViewModel
 import de.tum.`in`.tumcampusapp.component.ui.ticket.EventsViewState
@@ -24,6 +25,7 @@ import de.tum.`in`.tumcampusapp.utils.Const.CHAT_MEMBER
 import de.tum.`in`.tumcampusapp.utils.Utils
 import de.tum.`in`.tumcampusapp.utils.observeNonNull
 import kotlinx.android.synthetic.main.fragment_events.*
+import org.jetbrains.anko.defaultSharedPreferences
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -31,6 +33,10 @@ class EventsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private val eventType: EventType by lazy {
         arguments?.getSerializable(KEY_EVENT_TYPE) as EventType
+    }
+
+    private val appConfig: AppConfig by lazy {
+        AppConfig(requireContext().defaultSharedPreferences)
     }
 
     @Inject
@@ -99,7 +105,7 @@ class EventsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onRefresh() {
-        val isLoggedIn = Utils.getSetting(requireContext(), CHAT_MEMBER, ChatMember::class.java) != null
+        val isLoggedIn = appConfig.chatMember != null
         viewModel.refreshEventsAndTickets(isLoggedIn)
     }
 

@@ -11,14 +11,15 @@ import android.graphics.Canvas
 import android.os.BatteryManager
 import android.os.Build
 import android.preference.PreferenceManager
-import androidx.core.content.ContextCompat
-import androidx.core.content.pm.PackageInfoCompat
 import android.text.Html
 import android.text.Spanned
 import android.util.Log
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.content.pm.PackageInfoCompat
 import com.google.gson.Gson
 import de.tum.`in`.tumcampusapp.BuildConfig
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import org.jetbrains.anko.defaultSharedPreferences
 import java.io.IOException
 import java.io.InputStream
@@ -68,6 +69,7 @@ object Utils {
      * @param defaultVal default value
      * @return setting value, defaultVal if undefined
      */
+    @Deprecated("Move to AppConfig once WorkManager PR is merged")
     @JvmStatic
     fun getSetting(c: Context, key: String, defaultVal: String): String {
         val sp = PreferenceManager.getDefaultSharedPreferences(c)
@@ -82,6 +84,7 @@ object Utils {
      * @param defaultVal default value
      * @return setting value, defaultVal if undefined
      */
+    @Deprecated("Move to AppConfig once WorkManager PR is merged")
     @JvmStatic
     fun getSettingLong(c: Context, key: String, defaultVal: Long): Long {
         val sp = PreferenceManager.getDefaultSharedPreferences(c)
@@ -90,57 +93,6 @@ object Utils {
         } catch (ignore: ClassCastException) {
             sp.getString(key, null)?.toLongOrNull() ?: defaultVal
         }
-    }
-
-    /**
-     * Get a value from the default shared preferences.
-     *
-     * @param c          Context
-     * @param key        setting name
-     * @param defaultVal default value
-     * @return setting value, defaultVal if undefined
-     */
-    @JvmStatic
-    fun getSettingFloat(c: Context, key: String, defaultVal: Float): Float {
-        val sp = PreferenceManager.getDefaultSharedPreferences(c)
-        return try {
-            sp.getFloat(key, defaultVal)
-        } catch (ignore: ClassCastException) {
-            sp.getString(key, null)?.toFloatOrNull() ?: defaultVal
-        }
-    }
-
-    /**
-     * Get a value from the default shared preferences.
-     *
-     * @param c          Context
-     * @param key        setting name
-     * @param defaultVal default value
-     * @return setting value, defaultVal if undefined
-     */
-    @JvmStatic
-    fun getSettingInt(c: Context, key: String, defaultVal: Int): Int {
-        val sp = PreferenceManager.getDefaultSharedPreferences(c)
-        return try {
-            sp.getInt(key, defaultVal)
-        } catch (ignore: ClassCastException) {
-            sp.getString(key, null)?.toIntOrNull() ?: defaultVal
-        }
-    }
-
-    /**
-     * Get a value from the default shared preferences.
-     *
-     * @param c         Context
-     * @param key       setting name
-     * @param classInst e.g. ChatMember.class
-     * @return setting value
-     */
-    @JvmStatic
-    fun <T> getSetting(c: Context, key: String, classInst: Class<T>): T? {
-        val sp = PreferenceManager.getDefaultSharedPreferences(c)
-        val value = sp.getString(key, null) ?: return null
-        return Gson().fromJson(value, classInst)
     }
 
     /**
@@ -423,16 +375,10 @@ object Utils {
 
     @JvmStatic
     fun isBackgroundServicePermitted(context: Context): Boolean {
-        return isBackgroundServiceEnabled(context)
-                && (isBackgroundServiceAlwaysEnabled(context) || NetUtils.isConnectedWifi(context))
-    }
-
-    private fun isBackgroundServiceEnabled(context: Context): Boolean {
-        return Utils.getSettingBool(context, Const.BACKGROUND_MODE, false)
-    }
-
-    private fun isBackgroundServiceAlwaysEnabled(context: Context): Boolean {
-        return "0" == Utils.getSetting(context, "background_mode_set_to", "0")
+        val appConfig = AppConfig(context.defaultSharedPreferences)
+        val isOnWifi = NetUtils.isConnectedWifi(context)
+        return appConfig.isBackgroundServiceEnabled
+                && (appConfig.isBackgroundServiceAlwaysEnabled || isOnWifi)
     }
 
     @JvmStatic

@@ -15,6 +15,7 @@ data class DeviceRegister(var signature: String = "",
                           var publicKey: String = "",
                           var member: ChatMember? = null) {
     companion object {
+        @JvmStatic
         @Throws(NoPrivateKey::class)
         fun getDeviceRegister(c: Context, publickey: String, member: ChatMember?): DeviceRegister {
             val am = AuthenticationManager(c)

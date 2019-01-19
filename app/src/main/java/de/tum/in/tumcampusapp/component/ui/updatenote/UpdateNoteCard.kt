@@ -12,25 +12,22 @@ import de.tum.`in`.tumcampusapp.R
 import de.tum.`in`.tumcampusapp.component.ui.overview.CardManager
 import de.tum.`in`.tumcampusapp.component.ui.overview.card.Card
 import de.tum.`in`.tumcampusapp.component.ui.overview.card.CardViewHolder
-import de.tum.`in`.tumcampusapp.utils.Const
-import de.tum.`in`.tumcampusapp.utils.Utils
 
 class UpdateNoteCard(context: Context) : Card(CardManager.CARD_UPDATE_NOTE, context, "update_note") {
 
     override fun updateViewHolder(viewHolder: RecyclerView.ViewHolder) {
         super.updateViewHolder(viewHolder)
         val version = BuildConfig.VERSION_NAME
-        val updateMessage = Utils.getSetting(context, Const.UPDATE_MESSAGE, "")
+        val updateMessage = appConfig.updateMessage.orEmpty()
         (viewHolder as UpdateNoteViewHolder).bind(updateMessage, version)
     }
 
     override fun shouldShow(prefs: SharedPreferences): Boolean {
-        return Utils.getSettingBool(context, Const.SHOW_UPDATE_NOTE, false)
-        && Utils.getSetting(context, Const.UPDATE_MESSAGE, "").isNotEmpty()
+        return appConfig.showUpdateNote && appConfig.updateMessage != null
     }
 
     override fun discard(editor: SharedPreferences.Editor) {
-        Utils.setSetting(context, Const.SHOW_UPDATE_NOTE, false)
+        appConfig.showUpdateNote = false
     }
 
     companion object {
@@ -43,8 +40,8 @@ class UpdateNoteCard(context: Context) : Card(CardManager.CARD_UPDATE_NOTE, cont
     }
 
     class UpdateNoteViewHolder(view: View) : CardViewHolder(view) {
-        internal var subtitleView: TextView = view.findViewById(R.id.update_note_subtitle)
-        internal var messageView: TextView = view.findViewById(R.id.update_note_message)
+        private var subtitleView: TextView = view.findViewById(R.id.update_note_subtitle)
+        private var messageView: TextView = view.findViewById(R.id.update_note_message)
 
         fun bind(updateMessage: String, version: String) {
             subtitleView.text = activity.getString(R.string.update_note_version, version)

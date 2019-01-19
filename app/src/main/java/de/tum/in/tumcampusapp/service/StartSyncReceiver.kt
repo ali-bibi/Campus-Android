@@ -6,8 +6,10 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.Utils
+import org.jetbrains.anko.defaultSharedPreferences
 
 /**
  * Receives on boot completed broadcast, sets alarm for next sync-try
@@ -17,6 +19,8 @@ class StartSyncReceiver : BroadcastReceiver() {
 
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
     override fun onReceive(context: Context, intent: Intent) {
+        val appConfig = AppConfig(context.defaultSharedPreferences)
+
         // Check intent if called from StartupActivity
         val isLaunch = intent.getBooleanExtra(Const.APP_LAUNCHES, false)
 
@@ -41,7 +45,7 @@ class StartSyncReceiver : BroadcastReceiver() {
 
         // Also start the SilenceService. It checks if it is enabled, so we don't need to
         SilenceService.enqueueWork(context, Intent())
-        if (intent.action != ACTION_WIFI_STATE_CHANGED && Utils.getSettingBool(context, Const.WIFI_SCANS_ALLOWED, false)) {
+        if (intent.action != ACTION_WIFI_STATE_CHANGED && appConfig.isWifiScanEnabled) {
             SendWifiMeasurementService.enqueueWork(context, Intent())
         }
     }

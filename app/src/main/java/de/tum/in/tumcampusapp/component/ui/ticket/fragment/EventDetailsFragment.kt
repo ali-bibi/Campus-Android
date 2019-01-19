@@ -109,7 +109,7 @@ class EventDetailsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             ticketButton.setOnClickListener { showTicket(event) }
         } else {
             ticketButton.text = getString(R.string.buy_ticket)
-            ticketButton.setOnClickListener { EventHelper.buyTicket(event, ticketButton, context) }
+            ticketButton.setOnClickListener { EventHelper.buyTicket(event, ticketButton, requireContext()) }
         }
 
         context?.let {

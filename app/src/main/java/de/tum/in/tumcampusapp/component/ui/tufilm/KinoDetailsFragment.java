@@ -128,7 +128,7 @@ public class KinoDetailsFragment extends Fragment {
             ticketButton.setText(R.string.buy_ticket);
             ticketButton.setVisibility(View.VISIBLE);
             ticketButton.setOnClickListener(
-                    view -> EventHelper.Companion.buyTicket(this.event, ticketButton, getContext()));
+                    view -> EventHelper.Companion.buyTicket(this.event, ticketButton, requireContext()));
         }
     }
 

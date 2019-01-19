@@ -1,7 +1,8 @@
 package de.tum.in.tumcampusapp.component.tumui.tutionfees;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,11 +12,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import de.tum.in.tumcampusapp.api.tumonline.CacheControl;
 import de.tum.in.tumcampusapp.api.tumonline.TUMOnlineClient;
 import de.tum.in.tumcampusapp.component.notifications.NotificationScheduler;
 import de.tum.in.tumcampusapp.component.notifications.ProvidesNotifications;
 import de.tum.in.tumcampusapp.component.notifications.persistence.NotificationType;
+import de.tum.in.tumcampusapp.component.prefs.AppConfig;
 import de.tum.in.tumcampusapp.component.tumui.tutionfees.model.Tuition;
 import de.tum.in.tumcampusapp.component.tumui.tutionfees.model.TuitionList;
 import de.tum.in.tumcampusapp.component.ui.overview.card.Card;
@@ -29,9 +32,13 @@ import retrofit2.Response;
 public class TuitionFeeManager implements ProvidesCard, ProvidesNotifications {
 
     private Context mContext;
+    private AppConfig appConfig;
 
     public TuitionFeeManager(Context context) {
         mContext = context;
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        appConfig = new AppConfig(sharedPrefs);
     }
 
     @NotNull
@@ -54,7 +61,7 @@ public class TuitionFeeManager implements ProvidesCard, ProvidesNotifications {
 
     @Override
     public boolean hasNotificationsEnabled() {
-        return Utils.getSettingBool(mContext, "card_tuition_fee_phone", true);
+        return appConfig.getHasTuitionFeesNotificationsEnabled();
     }
 
     @Nullable

@@ -12,6 +12,7 @@ import com.google.android.gms.common.GoogleApiAvailability
 import de.tum.`in`.tumcampusapp.api.app.TUMCabeClient
 import de.tum.`in`.tumcampusapp.component.other.locations.model.BuildingToGps
 import de.tum.`in`.tumcampusapp.component.other.locations.model.Geo
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.tumui.calendar.CalendarController
 import de.tum.`in`.tumcampusapp.component.tumui.roomfinder.model.RoomFinderCoordinate
 import de.tum.`in`.tumcampusapp.component.ui.cafeteria.model.Cafeteria
@@ -20,6 +21,7 @@ import de.tum.`in`.tumcampusapp.database.TcaDb
 import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.Utils
 import de.tum.`in`.tumcampusapp.utils.tryOrNull
+import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 import java.io.IOException
 import java.lang.Double.parseDouble
@@ -30,9 +32,14 @@ import java.util.*
  * the users current location, campus, next public transfer station and best cafeteria
  */
 class LocationManager(c: Context) {
+
     private val mContext: Context = c.applicationContext
     private val buildingToGpsDao: BuildingToGpsDao
     private var manager: android.location.LocationManager? = null
+
+    private val appConfig: AppConfig by lazy {
+        AppConfig(c.defaultSharedPreferences)
+    }
 
     init {
         val db = TcaDb.getInstance(c)
@@ -54,7 +61,7 @@ class LocationManager(c: Context) {
             return loc
         }
 
-        val selectedCampus = Utils.getSetting(mContext, Const.DEFAULT_CAMPUS, "G")
+        val selectedCampus = appConfig.defaultCampus
         val allCampi = Campus.values().associateBy(Campus::short)
 
         if ("X" != selectedCampus && allCampi.containsKey(selectedCampus)) {
@@ -150,15 +157,15 @@ class LocationManager(c: Context) {
     fun getStation(): StationResult? {
         val campus = getCurrentCampus() ?: return null
 
-        //Try to find favorite station for current campus
-        val station = Utils.getSetting(mContext, "card_stations_default_" + campus.short, "")
-        if ("".equals(station)) {
+        // Try to find favorite station for current campus
+        val station = appConfig.defaultStationForCampus(campus.short)
+        if (station == null) {
             Stations.values().associateBy(Stations::station).values.find {
                 it.station.station == station
             }?.let { return it.station }
         }
 
-        //Otherwise fallback to the default
+        // Otherwise fallback to the default
         return campus.defaultStation.station
     }
 

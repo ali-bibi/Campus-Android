@@ -4,8 +4,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -23,6 +25,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import de.tum.in.tumcampusapp.BuildConfig;
 import de.tum.in.tumcampusapp.R;
 import de.tum.in.tumcampusapp.api.app.AuthenticationManager;
+import de.tum.in.tumcampusapp.component.prefs.AppConfig;
 import de.tum.in.tumcampusapp.component.ui.overview.MainActivity;
 import de.tum.in.tumcampusapp.service.DownloadService;
 import de.tum.in.tumcampusapp.service.StartSyncReceiver;
@@ -46,6 +49,8 @@ public class StartupActivity extends AppCompatActivity {
     final AtomicBoolean initializationFinished = new AtomicBoolean(false);
     private int tapCounter; // for easter egg
 
+    private AppConfig appConfig;
+
     /**
      * Broadcast receiver gets notified if {@link de.tum.in.tumcampusapp.service.BackgroundService}
      * has prepared cards to be displayed
@@ -64,19 +69,22 @@ public class StartupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_startup);
 
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        appConfig = new AppConfig(sharedPrefs);
+
         // Only use Crashlytics if we are not compiling debug
         boolean isDebuggable = (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE));
         if (!BuildConfig.DEBUG && !isDebuggable) {
             Fabric.with(this, new Crashlytics());
-            Crashlytics.setString("TUMID", Utils.getSetting(this, Const.LRZ_ID, ""));
+            Crashlytics.setString("TUMID", appConfig.getLrzId());
             Crashlytics.setString("DeviceID", AuthenticationManager.getDeviceID(this));
         }
 
-        int savedAppVersion = Utils.getSettingInt(this, Const.SAVED_APP_VERSION, BuildConfig.VERSION_CODE);
+        int savedAppVersion = appConfig.getSavedAppVersion();
         if (savedAppVersion < BuildConfig.VERSION_CODE) {
-            Utils.setSetting(this, Const.SHOW_UPDATE_NOTE, true);
-            Utils.setSetting(this, Const.UPDATE_MESSAGE, "");
-            Utils.setSetting(this, Const.SAVED_APP_VERSION, BuildConfig.VERSION_CODE);
+            appConfig.setShowUpdateNote(true);
+            appConfig.setUpdateMessage(null);
+            appConfig.setSavedAppVersion(BuildConfig.VERSION_CODE);
         }
 
         initEasterEgg();
@@ -85,7 +93,7 @@ public class StartupActivity extends AppCompatActivity {
     }
 
     private void initEasterEgg() {
-        if (Utils.getSettingBool(this, Const.RAINBOW_MODE, false)) {
+        if (appConfig.getRainbowMode()) {
             ImageView tumLogo = findViewById(R.id.startupTumLogo);
             tumLogo.setImageResource(R.drawable.tum_logo_rainbow);
         }
@@ -98,7 +106,7 @@ public class StartupActivity extends AppCompatActivity {
                 tapCounter = 0;
 
                 // use the other logo and invert the setting
-                boolean rainbowEnabled = Utils.getSettingBool(this, Const.RAINBOW_MODE, false);
+                boolean rainbowEnabled = appConfig.getRainbowMode();
                 rainbowEnabled = !rainbowEnabled;
                 ImageView tumLogo = findViewById(R.id.startupTumLogo);
 
@@ -108,7 +116,7 @@ public class StartupActivity extends AppCompatActivity {
                     tumLogo.setImageResource(R.drawable.tum_logo_blue);
                 }
 
-                Utils.setSetting(this, Const.RAINBOW_MODE, rainbowEnabled);
+                appConfig.setRainbowMode(rainbowEnabled);
             }
         });
         background.setSoundEffectsEnabled(false);

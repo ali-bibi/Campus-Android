@@ -24,7 +24,6 @@ import de.tum.in.tumcampusapp.component.other.generic.activity.BaseActivity;
 import de.tum.in.tumcampusapp.component.tumui.feedback.model.Feedback;
 import de.tum.in.tumcampusapp.utils.Const;
 import de.tum.in.tumcampusapp.utils.ImageUtils;
-import de.tum.in.tumcampusapp.utils.Utils;
 
 import static de.tum.in.tumcampusapp.component.tumui.feedback.FeedbackController.PERMISSION_CAMERA;
 import static de.tum.in.tumcampusapp.component.tumui.feedback.FeedbackController.PERMISSION_FILES;
@@ -67,7 +66,7 @@ public class FeedbackActivity extends BaseActivity {
         includeEmail = findViewById(R.id.feedback_include_email);
         includeLocation = findViewById(R.id.feedback_include_location);
 
-        lrzId = Utils.getSetting(this, Const.LRZ_ID, "");
+        lrzId = getAppConfig().getLrzId();
 
         feedbackView.setText(feedback.getMessage());
         initFeedbackType();

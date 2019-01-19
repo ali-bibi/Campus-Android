@@ -6,6 +6,7 @@ import com.google.android.material.navigation.NavigationView
 import de.tum.`in`.tumcampusapp.R
 import de.tum.`in`.tumcampusapp.api.tumonline.AccessTokenManager
 import de.tum.`in`.tumcampusapp.component.other.settings.UserPreferencesActivity
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.tumui.calendar.CalendarActivity
 import de.tum.`in`.tumcampusapp.component.tumui.feedback.FeedbackActivity
 import de.tum.`in`.tumcampusapp.component.tumui.grades.GradesActivity
@@ -23,19 +24,23 @@ import de.tum.`in`.tumcampusapp.component.ui.overview.MainActivity
 import de.tum.`in`.tumcampusapp.component.ui.studyroom.StudyRoomsActivity
 import de.tum.`in`.tumcampusapp.component.ui.ticket.activity.EventsActivity
 import de.tum.`in`.tumcampusapp.utils.Const
-import de.tum.`in`.tumcampusapp.utils.Utils
 import de.tum.`in`.tumcampusapp.utils.add
 import de.tum.`in`.tumcampusapp.utils.allItems
+import org.jetbrains.anko.defaultSharedPreferences
 
 class DrawerMenuHelper(private val activity: Activity) {
+
+    private val appConfig: AppConfig by lazy {
+        AppConfig(activity.defaultSharedPreferences)
+    }
 
     private val drawerBundle: Bundle
         get() = Bundle().apply { putBoolean(Const.SHOW_DRAWER, true) }
 
     fun populateMenu(navigationView: NavigationView) {
         val hasTUMOAccess = AccessTokenManager.hasValidAccessToken(activity)
-        val chatEnabled = Utils.getSettingBool(activity, Const.GROUP_CHAT_ENABLED, false)
-        val employeeMode = Utils.getSettingBool(activity, Const.EMPLOYEE_MODE, false)
+        val chatEnabled = appConfig.isChatEnabled
+        val employeeMode = appConfig.isEmployeeMode
 
         val allItems = mutableListOf<SideNavigationItem>()
         val navigationMenu = navigationView.menu

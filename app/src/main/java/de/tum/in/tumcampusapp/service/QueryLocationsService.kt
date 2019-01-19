@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteException
 import androidx.core.app.JobIntentService
 import androidx.core.content.ContextCompat
 import de.tum.`in`.tumcampusapp.component.other.locations.LocationManager
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.tumui.calendar.CalendarController
 import de.tum.`in`.tumcampusapp.component.tumui.calendar.model.CalendarItem
 import de.tum.`in`.tumcampusapp.component.tumui.lectures.model.RoomLocations
@@ -15,15 +16,20 @@ import de.tum.`in`.tumcampusapp.database.TcaDb
 import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.Utils
 import de.tum.`in`.tumcampusapp.utils.sync.SyncManager
+import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.doAsync
 
 class QueryLocationsService : JobIntentService() {
 
     private lateinit var locationManager: LocationManager
 
+    private lateinit var appConfig: AppConfig
+
+
     override fun onCreate() {
         super.onCreate()
         locationManager = LocationManager(this)
+        appConfig = AppConfig(defaultSharedPreferences)
     }
 
     override fun onHandleWork(intent: Intent) {
@@ -42,7 +48,7 @@ class QueryLocationsService : JobIntentService() {
                 .also { roomLocationsDao.insert(*it.toTypedArray()) }
 
         // Do sync of google calendar if necessary
-        val shouldSyncCalendar = Utils.getSettingBool(this, Const.SYNC_CALENDAR, false)
+        val shouldSyncCalendar = appConfig.syncCalendar
                 && ContextCompat.checkSelfPermission(this, WRITE_CALENDAR) == PERMISSION_GRANTED
         val syncManager = SyncManager(this)
         val needsSync = syncManager.needSync(Const.SYNC_CALENDAR, TIME_TO_SYNC_CALENDAR)

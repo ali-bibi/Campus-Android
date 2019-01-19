@@ -7,12 +7,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import de.tum.`in`.tumcampusapp.R
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.ui.cafeteria.FavoriteDishDao
 import de.tum.`in`.tumcampusapp.component.ui.cafeteria.model.CafeteriaMenu
 import de.tum.`in`.tumcampusapp.component.ui.cafeteria.model.CafeteriaPrices
 import de.tum.`in`.tumcampusapp.database.TcaDb
-import de.tum.`in`.tumcampusapp.utils.Utils
 import de.tum.`in`.tumcampusapp.utils.splitOnChanged
+import org.jetbrains.anko.defaultSharedPreferences
 
 class CafeteriaMenusAdapter(
         private val context: Context,
@@ -26,6 +27,10 @@ class CafeteriaMenusAdapter(
 
     private val rolePrices: Map<String, String> by lazy {
         CafeteriaPrices.getRolePrices(context)
+    }
+
+    private val appConfig: AppConfig by lazy {
+        AppConfig(context.defaultSharedPreferences)
     }
 
     private val itemLayout: Int by lazy {
@@ -62,11 +67,7 @@ class CafeteriaMenusAdapter(
     }
 
     private fun shouldShowMenu(menu: CafeteriaMenu): Boolean {
-        val shouldShowMenuType = Utils.getSettingBool(
-                context,
-                "card_cafeteria_${menu.typeShort}",
-                "tg" == menu.typeShort || "ae" == menu.typeShort
-        )
+        val shouldShowMenuType = appConfig.showCafeteriaMenu(menu.typeShort)
         return shouldShowMenuType || isBigLayout
     }
 

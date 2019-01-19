@@ -93,7 +93,7 @@ public class StripePaymentActivity extends BaseActivity {
     private void initViews() {
         loadingLayout = findViewById(R.id.loading_layout);
 
-        String cardholder = Utils.getSetting(this, Const.KEY_CARD_HOLDER, "");
+        String cardholder = getAppConfig().getCreditcardHolder();
         cardholderEditText = findViewById(R.id.cardholder_edit_text);
         cardholderEditText.setText(cardholder);
         cardholderEditText.setSelection(cardholder.length());

@@ -1,6 +1,7 @@
 package de.tum.in.tumcampusapp.component.ui.news;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
@@ -13,11 +14,13 @@ import java.util.List;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 import de.tum.in.tumcampusapp.api.app.TUMCabeClient;
 import de.tum.in.tumcampusapp.api.tumonline.CacheControl;
 import de.tum.in.tumcampusapp.component.notifications.NotificationScheduler;
 import de.tum.in.tumcampusapp.component.notifications.ProvidesNotifications;
 import de.tum.in.tumcampusapp.component.notifications.model.AppNotification;
+import de.tum.in.tumcampusapp.component.prefs.AppConfig;
 import de.tum.in.tumcampusapp.component.ui.news.model.News;
 import de.tum.in.tumcampusapp.component.ui.news.model.NewsSources;
 import de.tum.in.tumcampusapp.component.ui.overview.card.Card;
@@ -36,6 +39,7 @@ public class NewsController implements ProvidesCard, ProvidesNotifications {
     private final Context context;
     private final NewsDao newsDao;
     private final NewsSourcesDao newsSourcesDao;
+    private final AppConfig appConfig;
 
     /**
      * Constructor, open/create database, create table if necessary
@@ -45,10 +49,11 @@ public class NewsController implements ProvidesCard, ProvidesNotifications {
     @Inject
     public NewsController(Context context) {
         this.context = context;
-        newsDao = TcaDb.getInstance(context)
-                       .newsDao();
-        newsSourcesDao = TcaDb.getInstance(context)
-                              .newsSourcesDao();
+        newsDao = TcaDb.getInstance(context).newsDao();
+        newsSourcesDao = TcaDb.getInstance(context).newsSourcesDao();
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        appConfig = new AppConfig(sharedPrefs);
     }
 
     /**
@@ -124,14 +129,13 @@ public class NewsController implements ProvidesCard, ProvidesNotifications {
      *
      * @return List of News
      */
-    public List<News> getAllFromDb(Context context) {
-        int selectedNewspread = Integer.parseInt(Utils.getSetting(this.context, "news_newspread", "7"));
+    public List<News> getAllFromDb() {
+        int selectedNewspread = appConfig.getNewspread();
         List<NewsSources> newsSources = getNewsSources();
         Collection<Integer> newsSourceIds = new ArrayList<>();
         for (NewsSources newsSource : newsSources) {
             int id = newsSource.getId();
-            boolean show = Utils.getSettingBool(context, "news_source_" + id, id <= 7);
-            if (show) {
+            if (appConfig.showNewspread(id)) {
                 newsSourceIds.add(id);
             }
         }
@@ -144,7 +148,7 @@ public class NewsController implements ProvidesCard, ProvidesNotifications {
      * @return index of the newest item that is older than 'now' - 1
      */
     public int getTodayIndex() {
-        int selectedNewspread = Integer.parseInt(Utils.getSetting(context, "news_newspread", "7"));
+        int selectedNewspread = appConfig.getNewspread();
         List<News> news = newsDao.getNewer(selectedNewspread);
         return news.isEmpty() ? 0 : news.size() - 1;
     }
@@ -155,26 +159,25 @@ public class NewsController implements ProvidesCard, ProvidesNotifications {
     }
 
     public List<NewsSources> getNewsSources() {
-        String selectedNewspread = Utils.getSetting(context, "news_newspread", "7");
+        String selectedNewspread = Integer.toString(appConfig.getNewspread());
         return newsSourcesDao.getNewsSources(selectedNewspread);
     }
 
-    public void setDismissed(String id, int d) {
+    void setDismissed(String id, int d) {
         newsDao.setDismissed(String.valueOf(d), id);
     }
 
     /**
      * Gather all sources that should be displayed
      *
-     * @param context
      * @return
      */
-    private Collection<Integer> getActiveSources(Context context) {
+    private Collection<Integer> getActiveSources() {
         Collection<Integer> sources = new ArrayList<>();
         List<NewsSources> newsSources = getNewsSources();
         for (NewsSources newsSource : newsSources) {
             Integer id = newsSource.getId();
-            if (Utils.getSettingBool(context, "card_news_source_" + id, true)) {
+            if (appConfig.showNewsSource(id)) {
                 sources.add(id);
             }
         }
@@ -185,10 +188,10 @@ public class NewsController implements ProvidesCard, ProvidesNotifications {
     @Override
     public List<Card> getCards(@NonNull CacheControl cacheControl) {
         List<Card> results = new ArrayList<>();
-        Collection<Integer> sources = getActiveSources(context);
+        Collection<Integer> sources = getActiveSources();
 
         List<News> news;
-        if (Utils.getSettingBool(context, "card_news_latest_only", true)) {
+        if (appConfig.getLatestNewsOnly()) {
             news = newsDao.getBySourcesLatest(sources.toArray(new Integer[0]));
         } else {
             news = newsDao.getBySources(sources.toArray(new Integer[0]));
@@ -211,7 +214,7 @@ public class NewsController implements ProvidesCard, ProvidesNotifications {
 
     @Override
     public boolean hasNotificationsEnabled() {
-        return Utils.getSettingBool(context, "card_news_phone", false);
+        return appConfig.getHasNewsNotificationsEnabled();
     }
 
 }

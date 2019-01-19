@@ -4,10 +4,12 @@ import android.Manifest;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +28,7 @@ import de.tum.in.tumcampusapp.component.notifications.ProvidesNotifications;
 import de.tum.in.tumcampusapp.component.notifications.model.FutureNotification;
 import de.tum.in.tumcampusapp.component.other.locations.RoomLocationsDao;
 import de.tum.in.tumcampusapp.component.other.locations.model.Geo;
+import de.tum.in.tumcampusapp.component.prefs.AppConfig;
 import de.tum.in.tumcampusapp.component.tumui.calendar.model.CalendarItem;
 import de.tum.in.tumcampusapp.component.tumui.calendar.model.Event;
 import de.tum.in.tumcampusapp.component.tumui.calendar.model.WidgetsTimetableBlacklist;
@@ -50,15 +53,16 @@ public class CalendarController implements ProvidesCard, ProvidesNotifications {
 
     private final WidgetsTimetableBlacklistDao widgetsTimetableBlacklistDao;
     private final Context mContext;
+    private final AppConfig appConfig;
 
     public CalendarController(Context context) {
         mContext = context;
-        calendarDao = TcaDb.getInstance(context)
-                .calendarDao();
-        roomLocationsDao = TcaDb.getInstance(context)
-                .roomLocationsDao();
-        widgetsTimetableBlacklistDao = TcaDb.getInstance(context)
-                .widgetsTimetableBlacklistDao();
+        calendarDao = TcaDb.getInstance(context).calendarDao();
+        roomLocationsDao = TcaDb.getInstance(context).roomLocationsDao();
+        widgetsTimetableBlacklistDao = TcaDb.getInstance(context).widgetsTimetableBlacklistDao();
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        appConfig = new AppConfig(sharedPrefs);
     }
 
     /**
@@ -317,7 +321,7 @@ public class CalendarController implements ProvidesCard, ProvidesNotifications {
 
     @Override
     public boolean hasNotificationsEnabled() {
-        return Utils.getSettingBool(mContext, "card_next_phone", false);
+        return appConfig.getHasCalendarNotificationsEnabled();
     }
 
 }

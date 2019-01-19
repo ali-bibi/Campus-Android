@@ -137,7 +137,7 @@ public class CalendarActivity extends ActivityForAccessingTumOnline<EventsRespon
             }
         }
 
-        isWeekMode = Utils.getSettingBool(this, Const.CALENDAR_WEEK_MODE, false);
+        isWeekMode = getAppConfig().isCalendarInWeekMode();
 
         disableRefresh();
         loadEvents(CacheControl.USE_CACHE);
@@ -227,7 +227,7 @@ public class CalendarActivity extends ActivityForAccessingTumOnline<EventsRespon
         menuItemExportGoogle.setEnabled(isFetched);
         menuItemDeleteCalendar.setEnabled(isFetched);
 
-        boolean autoSyncCalendar = Utils.getSettingBool(this, Const.SYNC_CALENDAR, false);
+        boolean autoSyncCalendar = getAppConfig().getSyncCalendar();
         menuItemExportGoogle.setVisible(!autoSyncCalendar);
         menuItemDeleteCalendar.setVisible(autoSyncCalendar);
         return super.onPrepareOptionsMenu(menu);
@@ -270,14 +270,13 @@ public class CalendarActivity extends ActivityForAccessingTumOnline<EventsRespon
         switch (i) {
             case R.id.action_switch_view_mode:
                 isWeekMode = !isWeekMode;
-                Utils.setSetting(this, Const.CALENDAR_WEEK_MODE, isWeekMode);
+                getAppConfig().setCalendarInWeekMode(isWeekMode);
                 refreshWeekView();
                 return true;
             case R.id.action_export_calendar:
                 exportCalendarToGoogle();
-
                 // Enable automatic calendar synchronisation
-                Utils.setSetting(this, Const.SYNC_CALENDAR, true);
+                getAppConfig().setSyncCalendar(true);
                 supportInvalidateOptionsMenu();
                 return true;
             case R.id.action_delete_calendar:
@@ -394,7 +393,7 @@ public class CalendarActivity extends ActivityForAccessingTumOnline<EventsRespon
         builder.setMessage(getString(R.string.dialog_delete_calendar))
                .setPositiveButton(getString(R.string.yes), (arg0, arg1) -> {
                    int deleted = CalendarController.deleteLocalCalendar(this);
-                   Utils.setSetting(CalendarActivity.this, Const.SYNC_CALENDAR, false);
+                   getAppConfig().setSyncCalendar(false);
                    this.invalidateOptionsMenu();
                    if (deleted > 0) {
                        Utils.showToast(this, R.string.calendar_deleted_toast);
@@ -415,7 +414,7 @@ public class CalendarActivity extends ActivityForAccessingTumOnline<EventsRespon
     }
 
     private List<WeekViewDisplayable<CalendarItem>> prepareCalendarItems(DateTime begin, DateTime end) {
-        boolean showCancelledEvents = Utils.getSettingBool(this, Const.CALENDAR_FILTER_CANCELED, true);
+        boolean showCancelledEvents = getAppConfig().getShowCanceledEvents();
         List<CalendarItem> calendarItems = showCancelledEvents
                 ? calendarController.getFromDbBetweenDates(begin, end)
                 : calendarController.getFromDbNotCancelledBetweenDates(begin, end);
@@ -553,14 +552,14 @@ public class CalendarActivity extends ActivityForAccessingTumOnline<EventsRespon
     }
 
     protected void initFilterCheckboxes() {
-        boolean showCancelledEvents = Utils.getSettingBool(this, Const.CALENDAR_FILTER_CANCELED, true);
+        boolean showCancelledEvents = getAppConfig().getShowCanceledEvents();
         Utils.log(showCancelledEvents ? "Show cancelled events" : "Hide cancelled events");
         menuItemFilterCanceled.setChecked(showCancelledEvents);
         applyFilterCanceled(showCancelledEvents);
     }
 
     protected void applyFilterCanceled(boolean val) {
-        Utils.setSetting(this, Const.CALENDAR_FILTER_CANCELED, val);
+        getAppConfig().setShowCanceledEvents(val);
         refreshWeekView();
     }
 

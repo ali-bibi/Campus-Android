@@ -5,24 +5,25 @@ import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Bundle
 import android.preference.PreferenceManager
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.navigation.NavigationView
-import androidx.core.app.NavUtils
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.app.NavUtils
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.navigation.NavigationView
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 import de.tum.`in`.tumcampusapp.R
 import de.tum.`in`.tumcampusapp.api.tumonline.AccessTokenManager
 import de.tum.`in`.tumcampusapp.component.other.generic.drawer.DrawerMenuHelper
 import de.tum.`in`.tumcampusapp.component.other.navigation.NavigationManager
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.ui.onboarding.WizNavStartActivity
 import de.tum.`in`.tumcampusapp.component.ui.overview.MainActivity
 import de.tum.`in`.tumcampusapp.di.AppComponent
@@ -30,6 +31,7 @@ import de.tum.`in`.tumcampusapp.di.app
 import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.Utils
 import de.tum.`in`.tumcampusapp.utils.closeDrawers
+import org.jetbrains.anko.defaultSharedPreferences
 import java.util.*
 
 /**
@@ -38,7 +40,11 @@ import java.util.*
 abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity(),
         SharedPreferences.OnSharedPreferenceChangeListener {
 
-    val injector: AppComponent by lazy { app.appComponent }
+    protected val injector: AppComponent by lazy { app.appComponent }
+
+    protected val appConfig: AppConfig by lazy {
+        AppConfig(defaultSharedPreferences)
+    }
 
     private val toolbar: Toolbar by lazy { findViewById<Toolbar>(R.id.main_toolbar) }
 
@@ -130,16 +136,16 @@ abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity(),
         background.visibility = if (isLoggedIn) View.VISIBLE else View.GONE
 
         if (isLoggedIn) {
-            val name = Utils.getSetting(this, Const.CHAT_ROOM_DISPLAY_NAME, "")
-            if (name.isNotEmpty()) {
+            val name = appConfig.chatRoomDisplayName
+            if (name != null) {
                 nameTextView.text = name
             } else {
                 nameTextView.visibility = View.INVISIBLE
             }
 
-            val lrzId = Utils.getSetting(this, Const.LRZ_ID, "")
-            val email = if (lrzId.isNotEmpty()) "$lrzId@mytum.de" else ""
-            if (email.isNotEmpty()) {
+            val lrzId = appConfig.lrzId
+            val email = lrzId?.let { "$it@mytum.de" }
+            if (email != null) {
                 emailTextView.text = email
             } else {
                 emailTextView.visibility = View.GONE
@@ -162,7 +168,7 @@ abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity(),
         val divider = headerView.findViewById<View>(R.id.divider)
         val rainbowBar = headerView.findViewById<View>(R.id.rainbow_bar)
 
-        if (Utils.getSettingBool(this, Const.RAINBOW_MODE, false)) {
+        if (appConfig.rainbowMode) {
             divider.visibility = View.GONE
             rainbowBar.visibility = View.VISIBLE
         } else {
@@ -214,7 +220,7 @@ abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity(),
     }
 
     private fun fetchProfilePicture(headerView: View) {
-        val id = Utils.getSetting(this, Const.TUMO_PIDENT_NR, "")
+        val id = appConfig.tumOnlinePersonId ?: return
         val parts = id.split("\\*".toRegex()).toTypedArray()
         if (parts.size != 2) {
             return

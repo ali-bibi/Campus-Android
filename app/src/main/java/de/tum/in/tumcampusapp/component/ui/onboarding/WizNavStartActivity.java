@@ -5,18 +5,19 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.button.MaterialButton;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.google.android.material.button.MaterialButton;
+
 import java.util.Locale;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import de.tum.in.tumcampusapp.R;
 import de.tum.in.tumcampusapp.api.app.AuthenticationManager;
 import de.tum.in.tumcampusapp.api.app.exception.NoPublicKey;
@@ -72,7 +73,7 @@ public class WizNavStartActivity extends ProgressActivity<Void> implements TextW
         lrzIdEditText = findViewById(R.id.lrz_id);
         lrzIdEditText.addTextChangedListener(this);
 
-        String lrzId = Utils.getSetting(this, Const.LRZ_ID, "");
+        String lrzId = getAppConfig().getLrzId();
         lrzIdEditText.setText(lrzId);
     }
 

@@ -2,7 +2,9 @@ package de.tum.in.tumcampusapp.api.app;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Base64;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -20,6 +22,7 @@ import java.util.UUID;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import de.tum.in.tumcampusapp.api.app.exception.NoPrivateKey;
 import de.tum.in.tumcampusapp.api.app.exception.NoPublicKey;
 import de.tum.in.tumcampusapp.api.app.model.DeviceRegister;
@@ -29,9 +32,9 @@ import de.tum.in.tumcampusapp.api.app.model.TUMCabeVerification;
 import de.tum.in.tumcampusapp.api.app.model.UploadStatus;
 import de.tum.in.tumcampusapp.api.tumonline.TUMOnlineClient;
 import de.tum.in.tumcampusapp.api.tumonline.model.TokenConfirmation;
+import de.tum.in.tumcampusapp.component.prefs.AppConfig;
 import de.tum.in.tumcampusapp.component.ui.chat.model.ChatMember;
 import de.tum.in.tumcampusapp.service.FcmTokenHandler;
-import de.tum.in.tumcampusapp.utils.Const;
 import de.tum.in.tumcampusapp.utils.RSASigner;
 import de.tum.in.tumcampusapp.utils.Utils;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -44,14 +47,18 @@ import retrofit2.Response;
  * This provides methods to authenticate this app installation with the tumcabe server and other instances requiring a pki.
  */
 public class AuthenticationManager {
+
     private final static String ALGORITHM = "RSA";
     private final static int RSA_KEY_SIZE = 1024;
-    private static String uniqueID;
+
     private final Context mContext;
+    private final AppConfig appConfig;
 
     @Inject
     public AuthenticationManager(Context c) {
         mContext = c;
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(c);
+        appConfig = new AppConfig(sharedPrefs);
     }
 
     /**
@@ -61,15 +68,16 @@ public class AuthenticationManager {
      * @return Unique device id
      */
     public static synchronized String getDeviceID(Context context) {
-        if (uniqueID == null) {
-            uniqueID = Utils.getSetting(context, Const.PREF_UNIQUE_ID, "");
-            if ("".equals(uniqueID)) {
-                uniqueID = UUID.randomUUID()
-                               .toString();
-                Utils.setSetting(context, Const.PREF_UNIQUE_ID, uniqueID);
-            }
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        AppConfig appConfig = new AppConfig(sharedPrefs);
+
+        String uniqueId = appConfig.getUniqueId();
+        if (uniqueId == null) {
+            uniqueId = UUID.randomUUID().toString();
+            appConfig.setUniqueId(uniqueId);
         }
-        return uniqueID;
+
+        return uniqueId;
     }
 
     private static KeyPairGenerator getKeyPairGeneratorInstance() {
@@ -97,8 +105,8 @@ public class AuthenticationManager {
      * @throws NoPrivateKey
      */
     private String getPrivateKeyString() throws NoPrivateKey {
-        String key = Utils.getSetting(mContext, Const.PRIVATE_KEY, "");
-        if (key.isEmpty()) {
+        String key = appConfig.getPrivateKey();
+        if (key == null) {
             throw new NoPrivateKey();
         }
         return key;
@@ -111,8 +119,8 @@ public class AuthenticationManager {
      * @throws NoPublicKey
      */
     public String getPublicKeyString() throws NoPublicKey {
-        String key = Utils.getSetting(mContext, Const.PUBLIC_KEY, "");
-        if (key.isEmpty()) {
+        String key = appConfig.getPublicKey();
+        if (key == null) {
             throw new NoPublicKey();
         }
         return key;
@@ -190,24 +198,23 @@ public class AuthenticationManager {
      */
     private void uploadKey(String publicKey, final ChatMember member) {
         //If we already uploaded it we don't need to redo that
-        if (Utils.getSettingBool(mContext, Const.PUBLIC_KEY_UPLOADED, false)) {
+        if (appConfig.getPublicKeyUploaded()) {
             this.tryToUploadFcmToken();
             return;
         }
 
         try {
-            DeviceRegister dr = DeviceRegister.Companion.getDeviceRegister(mContext, publicKey, member);
+            DeviceRegister dr = DeviceRegister.getDeviceRegister(mContext, publicKey, member);
 
             // Upload public key to the server
             TUMCabeClient.getInstance(mContext).deviceRegister(dr, new Callback<TUMCabeStatus>() {
                 @Override
                 public void onResponse(@NonNull Call<TUMCabeStatus> call,
                                        @NonNull Response<TUMCabeStatus> response) {
-                    //Remember that we are done, only if we have submitted with the member information
+                    // Remember that we are done, only if we have submitted with the member information
                     TUMCabeStatus status = response.body();
                     if (response.isSuccessful() && status != null && status.getStatus().equals("ok")) {
-                        Utils.setSetting(mContext, Const.PUBLIC_KEY_UPLOADED, true);
-
+                        appConfig.setPublicKeyUploaded(true);
                         AuthenticationManager.this.tryToUploadFcmToken();
                     }
                 }
@@ -215,7 +222,7 @@ public class AuthenticationManager {
                 @Override
                 public void onFailure(@NonNull Call<TUMCabeStatus> call, @NonNull Throwable t) {
                     Utils.log(t, "Failure uploading public key");
-                    Utils.setSetting(mContext, Const.PUBLIC_KEY_UPLOADED, false);
+                    appConfig.setPublicKeyUploaded(false);
                 }
             });
         } catch (NoPrivateKey noPrivateKey) {
@@ -229,7 +236,7 @@ public class AuthenticationManager {
      * @throws NoPublicKey Thrown if the stored key is empty.
      */
     public void uploadPublicKey() throws NoPublicKey {
-        final String token = Utils.getSetting(mContext, Const.ACCESS_TOKEN, "");
+        final String token = appConfig.getAccessToken();
         final String publicKey = Uri.encode(getPublicKeyString());
 
         TUMOnlineClient
@@ -256,9 +263,8 @@ public class AuthenticationManager {
     public void tryToUploadFcmToken() {
         // Check device for Play Services APK. If check succeeds, proceed with FCM registration.
         // Can only be done after the public key has been uploaded
-        if (Utils.getSettingBool(mContext, Const.PUBLIC_KEY_UPLOADED, false)
-            && GoogleApiAvailability.getInstance()
-                                    .isGooglePlayServicesAvailable(mContext) == ConnectionResult.SUCCESS) {
+        if (appConfig.getPublicKeyUploaded() && GoogleApiAvailability.getInstance()
+                .isGooglePlayServicesAvailable(mContext) == ConnectionResult.SUCCESS) {
             FcmTokenHandler.checkSetup(mContext);
         }
     }
@@ -269,8 +275,8 @@ public class AuthenticationManager {
      */
     @SuppressLint("CheckResult")
     public void uploadObfuscatedIds(UploadStatus uploadStatus) {
-        String lrzId = Utils.getSetting(mContext, Const.LRZ_ID, "");
-        if (lrzId.isEmpty()) {
+        String lrzId = appConfig.getLrzId();
+        if (lrzId == null) {
             Utils.log("Can't upload obfuscated ids: no lrz id");
             return;
         }
@@ -282,20 +288,20 @@ public class AuthenticationManager {
         }
 
         ObfuscatedIdsUpload upload = new ObfuscatedIdsUpload("", "", "", verification);
-        String studentId = Utils.getSetting(mContext, Const.TUMO_STUDENT_ID, "");
-        String employeeId = Utils.getSetting(mContext, Const.TUMO_EMPLOYEE_ID, "");
-        String externalId = Utils.getSetting(mContext, Const.TUMO_EXTERNAL_ID, "");
+        String studentId = appConfig.getTumOnlineStudentId();
+        String employeeId = appConfig.getTumOnlineEmployeeId();
+        String externalId = appConfig.getTumOnlineExternalId();
 
         boolean doUpload = false;
-        if (!uploadStatus.getStudentId() && !studentId.isEmpty()) {
+        if (!uploadStatus.getStudentId() && studentId != null) {
             upload.setStudentId(studentId);
             doUpload = true;
         }
-        if (!uploadStatus.getEmployeeId() && !employeeId.isEmpty()) {
+        if (!uploadStatus.getEmployeeId() && employeeId != null) {
             upload.setEmployeeId(employeeId);
             doUpload = true;
         }
-        if (!uploadStatus.getExternalId() && !externalId.isEmpty()) {
+        if (!uploadStatus.getExternalId() && externalId != null) {
             upload.setExternalId(externalId);
             doUpload = true;
         }
@@ -331,16 +337,25 @@ public class AuthenticationManager {
     /**
      * Save private key in shared preferences.
      */
-    private void saveKeys(String privateKeyString, String publicKeyString) {
-        Utils.setSetting(mContext, Const.PRIVATE_KEY, privateKeyString.trim());
-        Utils.setSetting(mContext, Const.PUBLIC_KEY, publicKeyString.trim());
+    private void saveKeys(@Nullable String privateKey, @Nullable String publicKey) {
+        if (privateKey != null) {
+            appConfig.setPrivateKey(privateKey.trim());
+        } else {
+            appConfig.setPrivateKey(null);
+        }
+
+        if (publicKey != null) {
+            appConfig.setPublicKey(publicKey.trim());
+        } else {
+            appConfig.setPublicKey(null);
+        }
     }
 
     /**
      * Reset all keys generated - this should actually never happen other than when a token is reset.
      */
     public void clearKeys() {
-        this.saveKeys("", "");
-        Utils.setSetting(mContext, Const.PUBLIC_KEY_UPLOADED, false);
+        saveKeys(null, null);
+        appConfig.setPublicKeyUploaded(false);
     }
 }

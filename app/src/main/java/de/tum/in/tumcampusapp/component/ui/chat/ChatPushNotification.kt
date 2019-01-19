@@ -17,6 +17,7 @@ import de.tum.`in`.tumcampusapp.R
 import de.tum.`in`.tumcampusapp.api.app.TUMCabeClient
 import de.tum.`in`.tumcampusapp.api.app.model.TUMCabeVerification
 import de.tum.`in`.tumcampusapp.component.other.generic.PushNotification
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.ui.chat.activity.ChatActivity
 import de.tum.`in`.tumcampusapp.component.ui.chat.activity.ChatRoomsActivity
 import de.tum.`in`.tumcampusapp.component.ui.chat.model.ChatRoom
@@ -29,6 +30,7 @@ import de.tum.`in`.tumcampusapp.service.FcmReceiverService.Companion.CHAT_NOTIFI
 import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.Utils
 import de.tum.`in`.tumcampusapp.utils.tryOrNull
+import org.jetbrains.anko.defaultSharedPreferences
 import org.jetbrains.anko.notificationManager
 
 /**
@@ -39,14 +41,16 @@ class ChatPushNotification(private val fcmChatPayload: FcmChat, context: Context
 
     private val passedChatRoom by lazy {
         tryOrNull {
-            TUMCabeClient.getInstance(context)
-                    .getChatRoom(fcmChatPayload.room)
+            TUMCabeClient.getInstance(context).getChatRoom(fcmChatPayload.room)
         }
     }
 
     private val chatMessageDao by lazy {
-        TcaDb.getInstance(context)
-                .chatMessageDao()
+        TcaDb.getInstance(context).chatMessageDao()
+    }
+
+    private val appConfig: AppConfig by lazy {
+        AppConfig(context.defaultSharedPreferences)
     }
 
     // we're showing the notificationId in the class itself because we have to load data first
@@ -124,7 +128,7 @@ class ChatPushNotification(private val fcmChatPayload: FcmChat, context: Context
             return
         }
 
-        if (!Utils.getSettingBool(context, "card_chat_phone", true) || fcmChatPayload.message != -1) {
+        if (appConfig.hasChatNotificationsEnabled.not() || fcmChatPayload.message != -1) {
             return
         }
         val contentIntent = taskStackBuilder.getPendingIntent(0, FLAG_UPDATE_CURRENT or FLAG_ONE_SHOT)

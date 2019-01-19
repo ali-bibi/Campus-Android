@@ -41,7 +41,7 @@ class NewsActivity : ActivityForDownloadingExternal(Const.NEWS, R.layout.activit
         super.onStart()
 
         // Gets all news from database
-        val news = newsController.getAllFromDb(this)
+        val news = newsController.getAllFromDb()
         if (news.isEmpty()) {
             if (NetUtils.isConnected(this)) {
                 showErrorLayout()
@@ -96,7 +96,7 @@ class NewsActivity : ActivityForDownloadingExternal(Const.NEWS, R.layout.activit
             // Populate the settingsPrefix dialog from the NewsController sources
             val (items, checkedItems) = newsController.newsSources
                     .map { (id, title) ->
-                        title to Utils.getSettingBool(this, "news_source_$id", true) }
+                        title to appConfig.showNewspread(id, true)
                     .unzip()
 
             val dialog = AlertDialog.Builder(this)

@@ -7,6 +7,7 @@ import de.tum.`in`.tumcampusapp.component.notifications.NotificationScheduler
 import de.tum.`in`.tumcampusapp.component.notifications.ProvidesNotifications
 import de.tum.`in`.tumcampusapp.component.other.general.model.Recent
 import de.tum.`in`.tumcampusapp.component.other.locations.LocationManager
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.tumui.calendar.model.Event
 import de.tum.`in`.tumcampusapp.component.ui.overview.card.Card
 import de.tum.`in`.tumcampusapp.component.ui.overview.card.ProvidesCard
@@ -19,8 +20,8 @@ import de.tum.`in`.tumcampusapp.component.ui.transportation.model.efa.StationRes
 import de.tum.`in`.tumcampusapp.component.ui.transportation.model.efa.WidgetDepartures
 import de.tum.`in`.tumcampusapp.database.TcaDb
 import de.tum.`in`.tumcampusapp.utils.NetUtils
-import de.tum.`in`.tumcampusapp.utils.Utils
 import io.reactivex.Observable
+import org.jetbrains.anko.defaultSharedPreferences
 import java.util.*
 
 /**
@@ -29,6 +30,11 @@ import java.util.*
 class TransportController(private val context: Context) : ProvidesCard, ProvidesNotifications {
 
     private val transportDao = TcaDb.getInstance(context).transportDao()
+
+    private val appConfig: AppConfig by lazy {
+        AppConfig(context.defaultSharedPreferences)
+    }
+
 
     /**
      * Check if the transport symbol is one of the user's favorites.
@@ -134,7 +140,7 @@ class TransportController(private val context: Context) : ProvidesCard, Provides
     }
 
     override fun hasNotificationsEnabled(): Boolean {
-        return Utils.getSettingBool(context, "card_mvv_phone", false)
+        return appConfig.hasTransportNotificationsEnabled
     }
 
     fun scheduleNotifications(events: List<Event>) {

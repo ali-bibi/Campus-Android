@@ -5,15 +5,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
-import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import de.tum.in.tumcampusapp.R;
 import de.tum.in.tumcampusapp.component.ui.overview.card.Card;
 import de.tum.in.tumcampusapp.component.ui.overview.card.CardViewHolder;
-import de.tum.in.tumcampusapp.utils.Utils;
 
 /**
  * Card that describes how to dismiss a card
@@ -61,12 +60,12 @@ public class SupportCard extends Card {
 
     @Override
     public void discard(@NonNull Editor editor) {
-        Utils.setSetting(getContext(), CardManager.SHOW_SUPPORT, false);
+        getAppConfig().setShowSupportCard(false);
     }
 
     @Override
     protected boolean shouldShow(@NonNull SharedPreferences prefs) {
-        return Utils.getSettingBool(getContext(), CardManager.SHOW_SUPPORT, true);
+        return getAppConfig().getShowSupportCard();
     }
 
     @Override

@@ -8,13 +8,13 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
-import androidx.core.content.pm.PackageInfoCompat
 import android.text.format.DateUtils
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
+import androidx.core.content.pm.PackageInfoCompat
 import de.psdev.licensesdialog.LicensesDialog
 import de.tum.`in`.tumcampusapp.BuildConfig
 import de.tum.`in`.tumcampusapp.R
@@ -90,10 +90,11 @@ class InformationActivity : BaseActivity(R.layout.activity_information) {
         }
         this.addDebugRow(debugInfos, "Bug reports", sp.getBoolean(Const.BUG_REPORTS, false).toString() + " ")
 
-        this.addDebugRow(debugInfos, "REG ID", Utils.getSetting(this, Const.FCM_REG_ID, ""))
+        this.addDebugRow(debugInfos, "REG ID", appConfig.firebaseRegId)
         this.addDebugRow(debugInfos, "REG transmission", DateUtils.getRelativeDateTimeString(this,
-                Utils.getSettingLong(this, Const.FCM_REG_ID_LAST_TRANSMISSION, 0),
+                appConfig.firebaseRegIdLastTransmission,
                 DateUtils.MINUTE_IN_MILLIS, DateUtils.DAY_IN_MILLIS * 2, 0).toString())
+
         try {
             val packageInfo = packageManager.getPackageInfo(packageName, 0)
             this.addDebugRow(debugInfos, "Version code", PackageInfoCompat.getLongVersionCode(packageInfo).toString())

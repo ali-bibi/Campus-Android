@@ -10,16 +10,20 @@ import android.os.Build
 import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.core.app.JobIntentService
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.tumui.calendar.CalendarController
 import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.Const.SILENCE_SERVICE_JOB_ID
 import de.tum.`in`.tumcampusapp.utils.Utils
+import org.jetbrains.anko.defaultSharedPreferences
 import org.joda.time.DateTime
 
 /**
  * Service used to silence the mobile during lectures
  */
 class SilenceService : JobIntentService() {
+
+    private lateinit var appConfig: AppConfig
 
     /**
      * We can't and won't change the ringer modes, if the device is in DoNotDisturb mode. DnD requires
@@ -46,6 +50,7 @@ class SilenceService : JobIntentService() {
 
     override fun onCreate() {
         super.onCreate()
+        appConfig = AppConfig(defaultSharedPreferences)
         Utils.log("SilenceService has started")
     }
 
@@ -55,14 +60,14 @@ class SilenceService : JobIntentService() {
     }
 
     override fun onHandleWork(intent: Intent) {
-        //Abort, if the settingsPrefix changed
-        if (!Utils.getSettingBool(this, Const.SILENCE_SERVICE, false)) {
+        // Abort, if the settingsPrefix changed
+        if (appConfig.isSilenceServiceActivated.not()) {
             // Don't schedule a new run, since the service is disabled
             return
         }
 
         if (!hasPermissions(this)) {
-            Utils.setSetting(this, Const.SILENCE_SERVICE, false)
+            appConfig.isSilenceServiceActivated = false
             return
         }
 

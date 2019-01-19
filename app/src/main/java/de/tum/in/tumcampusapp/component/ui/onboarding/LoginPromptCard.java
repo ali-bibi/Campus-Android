@@ -3,17 +3,15 @@ package de.tum.in.tumcampusapp.component.ui.onboarding;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import de.tum.in.tumcampusapp.R;
 import de.tum.in.tumcampusapp.component.ui.overview.CardManager;
 import de.tum.in.tumcampusapp.component.ui.overview.card.Card;
 import de.tum.in.tumcampusapp.component.ui.overview.card.CardViewHolder;
-import de.tum.in.tumcampusapp.utils.Const;
-import de.tum.in.tumcampusapp.utils.Utils;
 
 /**
  * Card that prompts the user to login to TUMonline since we don't show the wizard after the first launch anymore.
@@ -40,14 +38,13 @@ public class LoginPromptCard extends Card {
 
     @Override
     public void discard(@NonNull SharedPreferences.Editor editor) {
-        Utils.setSetting(this.getContext(), CardManager.SHOW_LOGIN, false);
+        getAppConfig().setShowLoginCard(false);
     }
 
     @Override
     protected boolean shouldShow(@NonNull SharedPreferences sharedPrefs) {
         // show on top as long as user hasn't swiped it away and isn't connected to TUMonline
-        return Utils.getSettingBool(this.getContext(), CardManager.SHOW_LOGIN, true)
-               && Utils.getSetting(getContext(), Const.LRZ_ID, "").isEmpty();
+        return getAppConfig().getShowLoginCard() && getAppConfig().getLrzId() == null;
     }
 
     @Override

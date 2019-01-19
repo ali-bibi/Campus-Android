@@ -1,9 +1,10 @@
 package de.tum.in.tumcampusapp.api.tumonline;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
-import de.tum.in.tumcampusapp.utils.Const;
-import de.tum.in.tumcampusapp.utils.Utils;
+import de.tum.in.tumcampusapp.component.prefs.AppConfig;
 
 /**
  * Easy accessible class for token management.
@@ -16,8 +17,10 @@ public class AccessTokenManager {
      * @return Whether access token is set
      */
     public static boolean hasValidAccessToken(Context context) {
-        final String oldAccessToken = Utils.getSetting(context, Const.ACCESS_TOKEN, "");
-        return oldAccessToken != null && oldAccessToken.length() > 2;
+        final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        final AppConfig appConfig = new AppConfig(sharedPrefs);
+        final String oldAccessToken = appConfig.getAccessToken();
+        return oldAccessToken.length() > 2;
     }
 
 }

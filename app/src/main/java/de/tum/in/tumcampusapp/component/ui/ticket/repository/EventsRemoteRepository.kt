@@ -4,9 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import de.tum.`in`.tumcampusapp.api.app.TUMCabeClient
 import de.tum.`in`.tumcampusapp.api.app.exception.NoPrivateKey
-import de.tum.`in`.tumcampusapp.component.ui.chat.model.ChatMember
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.ui.ticket.model.Event
-import de.tum.`in`.tumcampusapp.utils.Const.CHAT_MEMBER
 import de.tum.`in`.tumcampusapp.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -15,6 +14,7 @@ import javax.inject.Inject
 
 class EventsRemoteRepository @Inject constructor(
         private val context: Context,
+        private val appConfig: AppConfig,
         private val tumCabeClient: TUMCabeClient,
         private val eventsLocalRepository: EventsLocalRepository,
         private val ticketsLocalRepository: TicketsLocalRepository,
@@ -24,7 +24,7 @@ class EventsRemoteRepository @Inject constructor(
     fun fetchEventsAndTickets() {
         fetchAndStoreEvents()
 
-        val isLoggedIn = Utils.getSetting(context, CHAT_MEMBER, ChatMember::class.java) != null
+        val isLoggedIn = appConfig.chatMember != null
         if (isLoggedIn) {
             fetchAndStoreTickets()
         }
