@@ -1,8 +1,6 @@
 package de.tum.in.tumcampusapp.component.ui.cafeteria.controller;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
@@ -40,10 +38,7 @@ public class CafeteriaManager implements ProvidesCard, ProvidesNotifications {
 
         TcaDb db = TcaDb.getInstance(context);
         localRepository = new CafeteriaLocalRepository(db);
-
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        appConfig = new AppConfig(sharedPrefs);
-
+        appConfig = new AppConfig(context);
     }
 
     @NotNull

@@ -1,18 +1,25 @@
 package de.tum.`in`.tumcampusapp.component.prefs
 
+import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.google.gson.Gson
 import de.tum.`in`.tumcampusapp.BuildConfig
 import de.tum.`in`.tumcampusapp.component.ui.chat.model.ChatMember
+import de.tum.`in`.tumcampusapp.component.ui.news.model.NewsAlert
 import de.tum.`in`.tumcampusapp.component.ui.overview.CardManager
 import de.tum.`in`.tumcampusapp.component.ui.overview.card.Card
 import de.tum.`in`.tumcampusapp.utils.Const
+import de.tum.`in`.tumcampusapp.utils.DateTimeUtils.parseIsoDateWithMillis
+import de.tum.`in`.tumcampusapp.utils.tryOrNull
+import org.jetbrains.anko.defaultSharedPreferences
 import javax.inject.Inject
 
 class AppConfig @Inject constructor(
         private val sharedPrefs: SharedPreferences
 ) {
+
+    constructor(context: Context) : this(context.defaultSharedPreferences)
 
     var tumOnlinePersonId: String?
         get() = sharedPrefs.getString(Const.TUMO_PIDENT_NR)
@@ -78,8 +85,8 @@ class AppConfig @Inject constructor(
         get() = sharedPrefs.getBoolean(Const.PUBLIC_KEY_UPLOADED, false)
         set(value) = sharedPrefs.edit { putBoolean(Const.PUBLIC_KEY_UPLOADED, value) }
 
-    var accessToken: String
-        get() = sharedPrefs.getString(Const.ACCESS_TOKEN, "")
+    var accessToken: String?
+        get() = sharedPrefs.getString(Const.ACCESS_TOKEN)
         set(value) = sharedPrefs.edit { putString(Const.ACCESS_TOKEN, value) }
 
     var tumOnlineStudentId: String?
@@ -219,6 +226,59 @@ class AppConfig @Inject constructor(
         get() = sharedPrefs.getBoolean(Const.REFRESH_CARDS, false)
         set(value) = sharedPrefs.edit { putBoolean(Const.REFRESH_CARDS, value) }
 
+    var lastUpdate: Long
+        get() = sharedPrefs.getLong("last_update", 0L)
+        set(value) = sharedPrefs.edit { putLong("last_update", value) }
+
+    var showTopNews: Boolean
+        get() = sharedPrefs.getBoolean("show_top_news", true)
+        set(value) = sharedPrefs.edit { putBoolean("show_top_news", value) }
+
+    var newsAlertUntil: String?
+        get() = sharedPrefs.getString(Const.NEWS_ALERT_SHOW_UNTIL)
+        set(value) = sharedPrefs.edit { putString(Const.NEWS_ALERT_SHOW_UNTIL, value) }
+
+    var newsAlertImageUrl: String?
+        get() = sharedPrefs.getString(Const.NEWS_ALERT_IMAGE)
+        set(value) = sharedPrefs.edit { putString(Const.NEWS_ALERT_IMAGE, value) }
+
+    var newsAlertUrl: String?
+        get() = sharedPrefs.getString(Const.NEWS_ALERT_LINK)
+        set(value) = sharedPrefs.edit { putString(Const.NEWS_ALERT_LINK, value) }
+
+    var newsAlert: NewsAlert?
+        get() = fetchNewsAlert()
+        set(value) {
+            value?.let { storeNewsAlert(value) }
+        }
+
+    private fun fetchNewsAlert(): NewsAlert? {
+        val displayUntil = newsAlertUntil ?: return null
+        val until = tryOrNull { parseIsoDateWithMillis(displayUntil) } ?: return null
+
+        if (until.isBeforeNow || showTopNews.not()) {
+            return null
+        }
+
+        val link = newsAlertUrl ?: return null
+        val imageUrl = newsAlertImageUrl ?: return null
+        return NewsAlert(imageUrl, link, displayUntil)
+    }
+
+    private fun storeNewsAlert(newsAlert: NewsAlert) {
+        val oldShowUntil = newsAlertUntil
+        val oldImage = newsAlertImageUrl
+
+        newsAlertImageUrl = newsAlert.url
+        newsAlertUrl = newsAlert.link
+
+        // there is a NewsAlert update if the image link or the date changed
+        // --> Card should be displayed again
+        showTopNews = oldShowUntil != newsAlert.displayUntil || oldImage != newsAlert.url
+
+        newsAlertUntil = newsAlert.displayUntil
+    }
+
     fun defaultStationForCampus(campus: String): String? {
         return sharedPrefs.getString("card_stations_default_$campus")
     }
@@ -233,6 +293,10 @@ class AppConfig @Inject constructor(
 
     fun showNewsSource(newspread: Int): Boolean {
         return sharedPrefs.getBoolean("card_news_source_$newspread", true)
+    }
+
+    fun setShowNewsSource(newsSource: Int, show: Boolean) {
+        sharedPrefs.edit { putBoolean("news_source_$newsSource", show) }
     }
 
     fun showCafeteriaMenu(menu: String): Boolean {

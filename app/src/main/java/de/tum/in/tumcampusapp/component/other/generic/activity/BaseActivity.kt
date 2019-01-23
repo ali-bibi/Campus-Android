@@ -43,7 +43,7 @@ abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity(),
     protected val injector: AppComponent by lazy { app.appComponent }
 
     protected val appConfig: AppConfig by lazy {
-        AppConfig(defaultSharedPreferences)
+        AppConfig(this)
     }
 
     private val toolbar: Toolbar by lazy { findViewById<Toolbar>(R.id.main_toolbar) }

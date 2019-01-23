@@ -10,7 +10,7 @@ import org.jetbrains.anko.defaultSharedPreferences
 class CheckTokenInterceptor(private val context: Context) : Interceptor {
 
     private val appConfig: AppConfig by lazy {
-        AppConfig(context.defaultSharedPreferences)
+        AppConfig(context)
     }
 
 

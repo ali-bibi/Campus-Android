@@ -50,7 +50,7 @@ class SilenceService : JobIntentService() {
 
     override fun onCreate() {
         super.onCreate()
-        appConfig = AppConfig(defaultSharedPreferences)
+        appConfig = AppConfig(this)
         Utils.log("SilenceService has started")
     }
 

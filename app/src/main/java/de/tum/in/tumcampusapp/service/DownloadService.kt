@@ -9,6 +9,7 @@ import de.tum.`in`.tumcampusapp.api.app.AuthenticationManager
 import de.tum.`in`.tumcampusapp.api.app.TUMCabeClient
 import de.tum.`in`.tumcampusapp.api.app.model.UploadStatus
 import de.tum.`in`.tumcampusapp.api.tumonline.AccessTokenManager
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.tumui.grades.GradesBackgroundUpdater
 import de.tum.`in`.tumcampusapp.component.ui.cafeteria.controller.CafeteriaMenuManager
 import de.tum.`in`.tumcampusapp.component.ui.cafeteria.model.Location
@@ -67,6 +68,9 @@ class DownloadService : JobIntentService() {
 
     @Inject
     lateinit var gradesBackgroundUpdater: GradesBackgroundUpdater
+
+    @Inject
+    lateinit var updateNoteController: UpdateNoteController
 
     private val disposable = CompositeDisposable()
 
@@ -153,7 +157,7 @@ class DownloadService : JobIntentService() {
     }
 
     private fun downloadUpdateNote(): Boolean {
-        UpdateNoteController(this).downloadUpdateNote()
+        updateNoteController.downloadUpdateNote()
         return true
     }
 
@@ -223,7 +227,10 @@ class DownloadService : JobIntentService() {
          * @param context Context
          * @return time when BackgroundService was executed last time
          */
-        @JvmStatic fun lastUpdate(context: Context): Long = Utils.getSettingLong(context, LAST_UPDATE, 0L)
+        @JvmStatic fun lastUpdate(context: Context): Long {
+            val appConfig = AppConfig(context)
+            return appConfig.lastUpdate
+        }
 
         /**
          * Download the data for a specific intent

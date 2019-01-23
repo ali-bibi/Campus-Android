@@ -31,7 +31,7 @@ import org.jetbrains.anko.defaultSharedPreferences
 class DrawerMenuHelper(private val activity: Activity) {
 
     private val appConfig: AppConfig by lazy {
-        AppConfig(activity.defaultSharedPreferences)
+        AppConfig(activity)
     }
 
     private val drawerBundle: Bundle

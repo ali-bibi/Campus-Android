@@ -77,25 +77,6 @@ object Utils {
     }
 
     /**
-     * Get a value from the default shared preferences.
-     *
-     * @param c          Context
-     * @param key        setting name
-     * @param defaultVal default value
-     * @return setting value, defaultVal if undefined
-     */
-    @Deprecated("Move to AppConfig once WorkManager PR is merged")
-    @JvmStatic
-    fun getSettingLong(c: Context, key: String, defaultVal: Long): Long {
-        val sp = PreferenceManager.getDefaultSharedPreferences(c)
-        return try {
-            sp.getLong(key, defaultVal)
-        } catch (ignore: ClassCastException) {
-            sp.getString(key, null)?.toLongOrNull() ?: defaultVal
-        }
-    }
-
-    /**
      * Return the boolean value of a setting.
      *
      * @param c          Context
@@ -241,21 +222,6 @@ object Utils {
     /**
      * Sets the value of a setting
      *
-     * @param c     Context
-     * @param key   setting key
-     * @param value String value
-     */
-    @JvmStatic
-    fun setSetting(c: Context, key: String, value: String) {
-        val sp = PreferenceManager.getDefaultSharedPreferences(c)
-        sp.edit()
-                .putString(key, value)
-                .apply()
-    }
-
-    /**
-     * Sets the value of a setting
-     *
      * @param c   Context
      * @param key setting key
      */
@@ -375,7 +341,7 @@ object Utils {
 
     @JvmStatic
     fun isBackgroundServicePermitted(context: Context): Boolean {
-        val appConfig = AppConfig(context.defaultSharedPreferences)
+        val appConfig = AppConfig(context)
         val isOnWifi = NetUtils.isConnectedWifi(context)
         return appConfig.isBackgroundServiceEnabled
                 && (appConfig.isBackgroundServiceAlwaysEnabled || isOnWifi)

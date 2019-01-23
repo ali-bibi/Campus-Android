@@ -36,7 +36,7 @@ class EventsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private val appConfig: AppConfig by lazy {
-        AppConfig(requireContext().defaultSharedPreferences)
+        AppConfig(requireContext())
     }
 
     @Inject

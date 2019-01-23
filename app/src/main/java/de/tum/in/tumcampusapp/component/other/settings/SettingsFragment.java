@@ -56,9 +56,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
         // Load the correct preference category
         setPreferencesFromResource(R.xml.settings, rootKey);
         mContext = getActivity();
-
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        appConfig = new AppConfig(sharedPrefs);
+        appConfig = new AppConfig(requireContext());
 
         populateNewsSources();
         setUpEmployeeSettings();

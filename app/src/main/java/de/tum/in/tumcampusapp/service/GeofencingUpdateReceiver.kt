@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingEvent
-import de.tum.`in`.tumcampusapp.utils.Const
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.utils.Utils
 
 /**
@@ -24,18 +24,20 @@ class GeofencingUpdateReceiver : BroadcastReceiver() {
             return
         }
 
+        val appConfig = AppConfig(context)
+
         // Get the transition type.
         val geofenceTransition = geofencingEvent.geofenceTransition
 
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
             BackgroundService.enqueueWork(context, Intent())
-            Utils.setSetting(context, Const.BACKGROUND_MODE, true)
+            appConfig.isBackgroundServiceEnabled = true
             Utils.logwithTag(TAG, "Geofencing detected user entering munich, " +
                     "enabling Auto updates")
         } else if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
             val service = Intent(context, BackgroundService::class.java)
             context.stopService(service)
-            Utils.setSetting(context, Const.BACKGROUND_MODE, false)
+            appConfig.isBackgroundServiceEnabled = false
             Utils.logwithTag(TAG, "Geofencing detected user leaving munich, " +
                     "disabling Auto updates")
         }

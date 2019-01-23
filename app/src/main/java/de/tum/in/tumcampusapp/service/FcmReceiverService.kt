@@ -8,12 +8,15 @@ import com.google.firebase.messaging.RemoteMessage
 import de.tum.`in`.tumcampusapp.api.app.TUMCabeClient
 import de.tum.`in`.tumcampusapp.component.other.general.UpdatePushNotification
 import de.tum.`in`.tumcampusapp.component.other.generic.PushNotification
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.ui.alarm.AlarmPushNotification
 import de.tum.`in`.tumcampusapp.component.ui.chat.ChatPushNotification
+import de.tum.`in`.tumcampusapp.di.injector
 import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.Utils
 import org.jetbrains.anko.notificationManager
 import java.io.IOException
+import javax.inject.Inject
 
 /**
  * This `IntentService` does the actual handling of the FCM message.
@@ -23,6 +26,14 @@ import java.io.IOException
  * wake lock.
  */
 class FcmReceiverService : FirebaseMessagingService() {
+
+    @Inject
+    lateinit var appConfig: AppConfig
+
+    override fun onCreate() {
+        super.onCreate()
+        injector.inject(this)
+    }
 
     override fun onMessageReceived(message: RemoteMessage?) {
         val data = message?.data ?: return
@@ -92,8 +103,8 @@ class FcmReceiverService : FirebaseMessagingService() {
     override fun onNewToken(token: String?) {
         super.onNewToken(token)
         Utils.log("new FCM token received")
-        Utils.setSetting(this, Const.FCM_INSTANCE_ID, FirebaseInstanceId.getInstance().id)
-        Utils.setSetting(this, Const.FCM_TOKEN_ID, token ?: "")
+        appConfig.firebaseInstanceId = FirebaseInstanceId.getInstance().id
+        appConfig.firebaseTokenId = token
     }
 
     /**

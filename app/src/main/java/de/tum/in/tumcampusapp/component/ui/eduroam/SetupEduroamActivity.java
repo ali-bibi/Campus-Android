@@ -104,7 +104,7 @@ public class SetupEduroamActivity extends BaseActivity {
                                                                            .toString());
         if (success) {
             Utils.showToast(this, R.string.eduroam_success);
-            Utils.setSetting(this, Const.REFRESH_CARDS, true);
+            getAppConfig().setRefreshCards(true);
             finish();
         } else {
             findViewById(R.id.eduroam_config_error).setVisibility(View.VISIBLE);
@@ -123,7 +123,7 @@ public class SetupEduroamActivity extends BaseActivity {
 
     @SuppressWarnings("UnusedParameters")
     public void onClickCancel(View v) {
-        Utils.setSetting(this, Const.REFRESH_CARDS, true);
+        getAppConfig().setRefreshCards(true);
         finish();
     }
 }

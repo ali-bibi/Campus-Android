@@ -4,12 +4,10 @@ import android.Manifest;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
 
 import org.jetbrains.annotations.NotNull;
@@ -60,9 +58,7 @@ public class CalendarController implements ProvidesCard, ProvidesNotifications {
         calendarDao = TcaDb.getInstance(context).calendarDao();
         roomLocationsDao = TcaDb.getInstance(context).roomLocationsDao();
         widgetsTimetableBlacklistDao = TcaDb.getInstance(context).widgetsTimetableBlacklistDao();
-
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        appConfig = new AppConfig(sharedPrefs);
+        appConfig = new AppConfig(context);
     }
 
     /**

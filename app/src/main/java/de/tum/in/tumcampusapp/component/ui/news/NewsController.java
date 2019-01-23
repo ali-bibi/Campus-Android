@@ -1,7 +1,6 @@
 package de.tum.in.tumcampusapp.component.ui.news;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
@@ -14,7 +13,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
-import androidx.preference.PreferenceManager;
 import de.tum.in.tumcampusapp.api.app.TUMCabeClient;
 import de.tum.in.tumcampusapp.api.tumonline.CacheControl;
 import de.tum.in.tumcampusapp.component.notifications.NotificationScheduler;
@@ -51,9 +49,7 @@ public class NewsController implements ProvidesCard, ProvidesNotifications {
         this.context = context;
         newsDao = TcaDb.getInstance(context).newsDao();
         newsSourcesDao = TcaDb.getInstance(context).newsSourcesDao();
-
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        appConfig = new AppConfig(sharedPrefs);
+        appConfig = new AppConfig(context);
     }
 
     /**

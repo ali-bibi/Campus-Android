@@ -1,8 +1,6 @@
 package de.tum.in.tumcampusapp.component.tumui.tutionfees;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,9 +34,7 @@ public class TuitionFeeManager implements ProvidesCard, ProvidesNotifications {
 
     public TuitionFeeManager(Context context) {
         mContext = context;
-
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        appConfig = new AppConfig(sharedPrefs);
+        appConfig = new AppConfig(context);
     }
 
     @NotNull

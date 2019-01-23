@@ -59,7 +59,7 @@ class ScanResultsAvailableReceiver : BroadcastReceiver() {
         }
 
         locationManager = context.locationManager
-        appConfig = AppConfig(context.defaultSharedPreferences)
+        appConfig = AppConfig(context)
 
         //Check if locations are enabled
         val locationsEnabled = ContextCompat.checkSelfPermission(
@@ -138,7 +138,7 @@ class ScanResultsAvailableReceiver : BroadcastReceiver() {
     class NeverShowAgainService : IntentService(NEVER_SHOW) {
 
         private val appConfig: AppConfig by lazy {
-            AppConfig(defaultSharedPreferences)
+            AppConfig(this)
         }
 
         override fun onHandleIntent(intent: Intent) {
@@ -162,7 +162,7 @@ class ScanResultsAvailableReceiver : BroadcastReceiver() {
          */
         @JvmStatic fun showNotification(context: Context) {
             // If previous notification is still visible
-            val appConfig = AppConfig(context.defaultSharedPreferences)
+            val appConfig = AppConfig(context)
             if (appConfig.showWifiSetupNotification.not()) {
                 return
             }

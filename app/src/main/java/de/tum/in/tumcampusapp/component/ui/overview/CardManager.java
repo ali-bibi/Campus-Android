@@ -6,8 +6,8 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
 import de.tum.in.tumcampusapp.R;
+import de.tum.in.tumcampusapp.component.prefs.AppConfig;
 import de.tum.in.tumcampusapp.database.TcaDb;
-import de.tum.in.tumcampusapp.utils.Utils;
 
 import static de.tum.in.tumcampusapp.utils.Const.CARD_POSITION_PREFERENCE_SUFFIX;
 import static de.tum.in.tumcampusapp.utils.Const.DISCARD_SETTINGS_START;
@@ -46,17 +46,17 @@ public final class CardManager {
     /**
      * Resets dismiss settings for all cards
      */
-    public static void restoreCards(Context context) {
+    static void restoreCards(Context context) {
         context.getSharedPreferences(DISCARD_SETTINGS_START, 0)
                .edit()
                .clear()
                .apply();
 
-        TcaDb.getInstance(context)
-             .newsDao()
-             .restoreAllNews();
+        TcaDb.getInstance(context).newsDao().restoreAllNews();
 
-        Utils.setSetting(context, SHOW_TOP_NEWS, true);
+        AppConfig appConfig = new AppConfig(context);
+        appConfig.setShowTopNews(true);
+
         restoreCardPositions(context);
     }
 

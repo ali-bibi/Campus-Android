@@ -1,8 +1,6 @@
 package de.tum.in.tumcampusapp.component.ui.chat;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -49,9 +47,7 @@ public class ChatRoomController implements ProvidesCard {
 
         TcaDb db = TcaDb.getInstance(context);
         chatRoomDao = db.chatRoomDao();
-
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        appConfig = new AppConfig(sharedPrefs);
+        appConfig = new AppConfig(context);
     }
 
     /**

@@ -3,14 +3,13 @@ package de.tum.in.tumcampusapp.component.ui.onboarding;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
 import android.view.View;
 import android.widget.Toast;
 
 import java.net.UnknownHostException;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 import de.tum.in.tumcampusapp.R;
 import de.tum.in.tumcampusapp.api.tumonline.TUMOnlineClient;
 import de.tum.in.tumcampusapp.api.tumonline.exception.InactiveTokenException;
@@ -87,21 +86,18 @@ public class WizNavCheckTokenActivity extends ProgressActivity<Void> {
 
     private void handleDownloadSuccess(@NonNull IdentitySet identitySet) {
         Identity identity = identitySet.getIds().get(0);
-        Utils.setSetting(this, Const.CHAT_ROOM_DISPLAY_NAME, identity.toString());
+        getAppConfig().setChatRoomDisplayName(identity.getFullName());
 
         // Save the TUMonline ID to preferences
-        Utils.setSetting(this, Const.TUMO_PIDENT_NR, identity.getObfuscated_ids()
-                .getStudierende()); // Switch to identity.getObfuscated_id() in the future
-        Utils.setSetting(this, Const.TUMO_STUDENT_ID, identity.getObfuscated_ids()
-                .getStudierende());
-        Utils.setSetting(this, Const.TUMO_EXTERNAL_ID, identity.getObfuscated_ids()
-                .getExtern());
-        Utils.setSetting(this, Const.TUMO_EMPLOYEE_ID, identity.getObfuscated_ids()
-                .getBedienstete());
+        getAppConfig().setTumOnlinePersonId(identity.getObfuscated_ids().getStudierende()); // Switch to identity.getObfuscated_id() in the future
+        getAppConfig().setTumOnlineStudentId(identity.getObfuscated_ids().getStudierende());
+        getAppConfig().setTumOnlineExternalId(identity.getObfuscated_ids().getExtern());
+        getAppConfig().setTumOnlineEmployeeId(identity.getObfuscated_ids().getBedienstete());
+
         if (!identity.getObfuscated_ids().getBedienstete().isEmpty()
                 && identity.getObfuscated_ids().getStudierende().isEmpty()
                 && identity.getObfuscated_ids().getExtern().isEmpty()) {
-            Utils.setSetting(this, Const.EMPLOYEE_MODE, true);
+            getAppConfig().setEmployeeMode(true);
         }
 
         // can't upload the obfuscated ids here since we might not have a (chat) member yet

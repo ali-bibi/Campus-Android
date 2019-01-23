@@ -32,7 +32,7 @@ class TransportController(private val context: Context) : ProvidesCard, Provides
     private val transportDao = TcaDb.getInstance(context).transportDao()
 
     private val appConfig: AppConfig by lazy {
-        AppConfig(context.defaultSharedPreferences)
+        AppConfig(context)
     }
 
 

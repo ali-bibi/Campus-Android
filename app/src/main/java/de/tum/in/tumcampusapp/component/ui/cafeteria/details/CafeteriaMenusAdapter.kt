@@ -13,7 +13,6 @@ import de.tum.`in`.tumcampusapp.component.ui.cafeteria.model.CafeteriaMenu
 import de.tum.`in`.tumcampusapp.component.ui.cafeteria.model.CafeteriaPrices
 import de.tum.`in`.tumcampusapp.database.TcaDb
 import de.tum.`in`.tumcampusapp.utils.splitOnChanged
-import org.jetbrains.anko.defaultSharedPreferences
 
 class CafeteriaMenusAdapter(
         private val context: Context,
@@ -30,7 +29,7 @@ class CafeteriaMenusAdapter(
     }
 
     private val appConfig: AppConfig by lazy {
-        AppConfig(context.defaultSharedPreferences)
+        AppConfig(context)
     }
 
     private val itemLayout: Int by lazy {

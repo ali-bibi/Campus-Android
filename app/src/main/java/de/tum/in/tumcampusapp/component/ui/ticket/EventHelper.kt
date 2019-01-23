@@ -26,7 +26,7 @@ class EventHelper {
                 return
             }
 
-            val appConfig = AppConfig(context.defaultSharedPreferences)
+            val appConfig = AppConfig(context)
 
             val lrzId = appConfig.lrzId
             val chatRoomName = appConfig.chatRoomDisplayName

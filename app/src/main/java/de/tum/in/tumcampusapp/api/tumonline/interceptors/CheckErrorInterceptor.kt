@@ -4,14 +4,15 @@ import android.content.Context
 import com.tickaroo.tikxml.TikXml
 import de.tum.`in`.tumcampusapp.api.tumonline.exception.InvalidTokenException
 import de.tum.`in`.tumcampusapp.api.tumonline.model.Error
-import de.tum.`in`.tumcampusapp.utils.Const
-import de.tum.`in`.tumcampusapp.utils.Utils
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.utils.tryOrNull
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.InterruptedIOException
 
-class CheckErrorInterceptor(private val context: Context) : Interceptor {
+class CheckErrorInterceptor(context: Context) : Interceptor {
+
+    private val appConfig: AppConfig by lazy { AppConfig(context) }
 
     private val tikXml = TikXml.Builder()
             .exceptionOnUnreadXml(false)
@@ -32,14 +33,14 @@ class CheckErrorInterceptor(private val context: Context) : Interceptor {
             throw it.exception.also {
                 if (it is InvalidTokenException) {
                     // If it is an InvalidTokenException, we disable interaction with TUMonline.
-                    Utils.setSetting(context, Const.TUMO_DISABLED, true)
+                    appConfig.isTumOnlineDisabled = true
                 }
             }
         }
 
         // Because the request did not return an Error, we can re-enable TUMonline request
         // if they have been disabled before
-        Utils.setSetting(context, Const.TUMO_DISABLED, false)
+        appConfig.isTumOnlineDisabled = false
 
         return response
     }

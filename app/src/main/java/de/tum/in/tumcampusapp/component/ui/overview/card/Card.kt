@@ -26,7 +26,7 @@ abstract class Card(
 ) : Comparable<Card> {
 
     protected val appConfig: AppConfig by lazy {
-        AppConfig(context.defaultSharedPreferences)
+        AppConfig(context)
     }
 
     // Settings for showing this card on start page or as notification

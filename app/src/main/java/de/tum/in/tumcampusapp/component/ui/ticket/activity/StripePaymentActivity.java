@@ -112,7 +112,7 @@ public class StripePaymentActivity extends BaseActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String input = s.toString().trim();
-                Utils.setSetting(StripePaymentActivity.this, Const.KEY_CARD_HOLDER, input);
+                getAppConfig().setCreditcardHolder(input);
                 updateBuyButton();
             }
 

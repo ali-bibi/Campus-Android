@@ -7,10 +7,8 @@ import de.tum.`in`.tumcampusapp.api.app.TUMCabeClient
 import de.tum.`in`.tumcampusapp.api.app.model.DeviceUploadFcmToken
 import de.tum.`in`.tumcampusapp.api.app.model.TUMCabeStatus
 import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
-import de.tum.`in`.tumcampusapp.utils.Const.FCM_REG_ID_LAST_TRANSMISSION
 import de.tum.`in`.tumcampusapp.utils.Utils
 import de.tum.`in`.tumcampusapp.utils.tryOrNull
-import org.jetbrains.anko.defaultSharedPreferences
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -21,7 +19,7 @@ object FcmTokenHandler {
 
     @JvmStatic
     fun checkSetup(context: Context) {
-        val appConfig = AppConfig(context.defaultSharedPreferences)
+        val appConfig = AppConfig(context)
         val currentToken = appConfig.firebaseTokenId
 
         // If we failed, we need to re register
@@ -48,7 +46,7 @@ object FcmTokenHandler {
      */
     private fun registerInBackground(context: Context) {
         val executor = Executors.newSingleThreadExecutor()
-        val appConfig = AppConfig(context.defaultSharedPreferences)
+        val appConfig = AppConfig(context)
 
         FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener(executor,
                 OnSuccessListener { instanceIdResult ->
@@ -85,7 +83,7 @@ object FcmTokenHandler {
             DeviceUploadFcmToken.getDeviceUploadFcmToken(context, token)
         } ?: return
 
-        val appConfig = AppConfig(context.defaultSharedPreferences)
+        val appConfig = AppConfig(context)
 
         TUMCabeClient
                 .getInstance(context)
@@ -118,7 +116,7 @@ object FcmTokenHandler {
      */
     private fun checkRegisterIdUpdate(context: Context, regId: String) {
         // Regularly (once a day) update the server with the reg id
-        val appConfig = AppConfig(context.defaultSharedPreferences)
+        val appConfig = AppConfig(context)
         val lastTransmission = appConfig.firebaseRegIdLastTransmission
         val now = Date()
         if (now.time - 24 * 3600000 > lastTransmission) {

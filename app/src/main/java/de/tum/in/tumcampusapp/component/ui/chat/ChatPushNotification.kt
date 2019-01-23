@@ -50,7 +50,7 @@ class ChatPushNotification(private val fcmChatPayload: FcmChat, context: Context
     }
 
     private val appConfig: AppConfig by lazy {
-        AppConfig(context.defaultSharedPreferences)
+        AppConfig(context)
     }
 
     // we're showing the notificationId in the class itself because we have to load data first

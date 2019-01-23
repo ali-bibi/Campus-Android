@@ -12,7 +12,6 @@ import de.tum.`in`.tumcampusapp.component.other.generic.activity.ActivityForDown
 import de.tum.`in`.tumcampusapp.component.other.generic.adapter.EqualSpacingItemDecoration
 import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.NetUtils
-import de.tum.`in`.tumcampusapp.utils.Utils
 
 /**
  * Activity to show News (message, image, date)
@@ -66,8 +65,8 @@ class NewsActivity : ActivityForDownloadingExternal(Const.NEWS, R.layout.activit
         val newsSources = newsController.newsSources
 
         if (which < newsSources.size) {
-            val key = "news_source_" + newsSources[which].id
-            Utils.setSetting(this, key, isChecked)
+            val newsSourceId = newsSources[which].id
+            appConfig.setShowNewsSource(newsSourceId, isChecked)
 
             val layoutManager = recyclerView.layoutManager as LinearLayoutManager
             state = layoutManager.findFirstVisibleItemPosition()
@@ -97,6 +96,7 @@ class NewsActivity : ActivityForDownloadingExternal(Const.NEWS, R.layout.activit
             val (items, checkedItems) = newsController.newsSources
                     .map { (id, title) ->
                         title to appConfig.showNewspread(id, true)
+                    }
                     .unzip()
 
             val dialog = AlertDialog.Builder(this)

@@ -2,9 +2,7 @@ package de.tum.in.tumcampusapp.api.app;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.util.Base64;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -57,8 +55,7 @@ public class AuthenticationManager {
     @Inject
     public AuthenticationManager(Context c) {
         mContext = c;
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(c);
-        appConfig = new AppConfig(sharedPrefs);
+        appConfig = new AppConfig(c);
     }
 
     /**
@@ -68,8 +65,7 @@ public class AuthenticationManager {
      * @return Unique device id
      */
     public static synchronized String getDeviceID(Context context) {
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        AppConfig appConfig = new AppConfig(sharedPrefs);
+        AppConfig appConfig = new AppConfig(context);
 
         String uniqueId = appConfig.getUniqueId();
         if (uniqueId == null) {
@@ -236,7 +232,10 @@ public class AuthenticationManager {
      * @throws NoPublicKey Thrown if the stored key is empty.
      */
     public void uploadPublicKey() throws NoPublicKey {
-        final String token = appConfig.getAccessToken();
+        String token = appConfig.getAccessToken();
+        if (token == null) {
+            token = ""; // TODO
+        }
         final String publicKey = Uri.encode(getPublicKeyString());
 
         TUMOnlineClient

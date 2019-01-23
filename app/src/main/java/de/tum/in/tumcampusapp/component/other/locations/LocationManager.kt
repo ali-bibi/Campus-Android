@@ -38,7 +38,7 @@ class LocationManager(c: Context) {
     private var manager: android.location.LocationManager? = null
 
     private val appConfig: AppConfig by lazy {
-        AppConfig(c.defaultSharedPreferences)
+        AppConfig(c)
     }
 
     init {

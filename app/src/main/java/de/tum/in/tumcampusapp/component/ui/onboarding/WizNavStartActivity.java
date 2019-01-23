@@ -100,7 +100,7 @@ public class WizNavStartActivity extends ProgressActivity<Void> implements TextW
         }
 
         lrzId = enteredId;
-        Utils.setSetting(this, Const.LRZ_ID, lrzId);
+        getAppConfig().setLrzId(lrzId);
 
         hideKeyboard();
 
@@ -175,7 +175,7 @@ public class WizNavStartActivity extends ProgressActivity<Void> implements TextW
         Utils.log("AcquiredAccessToken = " + accessToken.getToken());
 
         // Save access token to preferences
-        Utils.setSetting(this, Const.ACCESS_TOKEN, accessToken.getToken());
+        getAppConfig().setAccessToken(accessToken.getToken());
 
         // Upload the secret to this new generated token
         AuthenticationManager am = new AuthenticationManager(this);
@@ -223,11 +223,11 @@ public class WizNavStartActivity extends ProgressActivity<Void> implements TextW
     }
 
     private void resetLrzId() {
-        Utils.setSetting(this, Const.LRZ_ID, "");
+        getAppConfig().setLrzId(null);
     }
 
     private void resetAccessToken() {
-        Utils.setSetting(this, Const.ACCESS_TOKEN, "");
+        getAppConfig().setAccessToken(null);
     }
 
     private void hideKeyboard() {

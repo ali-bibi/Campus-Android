@@ -29,7 +29,7 @@ class QueryLocationsService : JobIntentService() {
     override fun onCreate() {
         super.onCreate()
         locationManager = LocationManager(this)
-        appConfig = AppConfig(defaultSharedPreferences)
+        appConfig = AppConfig(this)
     }
 
     override fun onHandleWork(intent: Intent) {

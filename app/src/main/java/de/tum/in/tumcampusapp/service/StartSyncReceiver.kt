@@ -19,7 +19,7 @@ class StartSyncReceiver : BroadcastReceiver() {
 
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
     override fun onReceive(context: Context, intent: Intent) {
-        val appConfig = AppConfig(context.defaultSharedPreferences)
+        val appConfig = AppConfig(context)
 
         // Check intent if called from StartupActivity
         val isLaunch = intent.getBooleanExtra(Const.APP_LAUNCHES, false)

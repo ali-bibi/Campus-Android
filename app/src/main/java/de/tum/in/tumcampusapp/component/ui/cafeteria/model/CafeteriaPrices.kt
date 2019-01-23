@@ -130,7 +130,7 @@ object CafeteriaPrices {
      */
     @JvmStatic
     fun getRolePrices(context: Context): Map<String, String> {
-        val appConfig = AppConfig(context.defaultSharedPreferences)
+        val appConfig = AppConfig(context)
         val type = appConfig.role
         return when (type) {
             "0" -> STUDENT_PRICES
