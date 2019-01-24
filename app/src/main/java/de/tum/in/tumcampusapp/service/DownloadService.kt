@@ -72,6 +72,9 @@ class DownloadService : JobIntentService() {
     @Inject
     lateinit var updateNoteController: UpdateNoteController
 
+    @Inject
+    lateinit var appConfig: AppConfig
+
     private val disposable = CompositeDisposable()
 
     override fun onCreate() {
@@ -128,7 +131,7 @@ class DownloadService : JobIntentService() {
      * asks to verify private key, uploads fcm token and obfuscated ids (if missing)
      */
     private fun uploadMissingIds() {
-        val lrzId = Utils.getSetting(this, Const.LRZ_ID, "")
+        val lrzId = appConfig.lrzId
 
         val uploadStatus = tumCabeClient.getUploadStatus(lrzId) ?: return
         Utils.log("upload missing ids: " + uploadStatus.toString())
@@ -139,7 +142,7 @@ class DownloadService : JobIntentService() {
             authenticationManager.tryToUploadFcmToken()
         }
 
-        if (lrzId.isEmpty()) {
+        if (lrzId == null) {
             return // nothing else to be done
         }
 

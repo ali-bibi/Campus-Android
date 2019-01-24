@@ -2,6 +2,8 @@ package de.tum.`in`.tumcampusapp.component.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.media.AudioManager
+import android.media.AudioManager.RINGER_MODE_NORMAL
 import androidx.core.content.edit
 import com.google.gson.Gson
 import de.tum.`in`.tumcampusapp.BuildConfig
@@ -234,17 +236,29 @@ class AppConfig @Inject constructor(
         get() = sharedPrefs.getBoolean("show_top_news", true)
         set(value) = sharedPrefs.edit { putBoolean("show_top_news", value) }
 
-    var newsAlertUntil: String?
+    private var newsAlertUntil: String?
         get() = sharedPrefs.getString(Const.NEWS_ALERT_SHOW_UNTIL)
         set(value) = sharedPrefs.edit { putString(Const.NEWS_ALERT_SHOW_UNTIL, value) }
 
-    var newsAlertImageUrl: String?
+    private var newsAlertImageUrl: String?
         get() = sharedPrefs.getString(Const.NEWS_ALERT_IMAGE)
         set(value) = sharedPrefs.edit { putString(Const.NEWS_ALERT_IMAGE, value) }
 
-    var newsAlertUrl: String?
+    private var newsAlertUrl: String?
         get() = sharedPrefs.getString(Const.NEWS_ALERT_LINK)
         set(value) = sharedPrefs.edit { putString(Const.NEWS_ALERT_LINK, value) }
+
+    var isSilenceOn: Boolean
+        get() = sharedPrefs.getBoolean(Const.SILENCE_ON, false)
+        set(value) = sharedPrefs.edit { putBoolean(Const.SILENCE_ON, value) }
+
+    var silenceOldState: Int
+        get() = sharedPrefs.getString(Const.SILENCE_OLD_STATE, RINGER_MODE_NORMAL.toString()).toInt()
+        set(value) = sharedPrefs.edit { putString(Const.SILENCE_OLD_STATE, value.toString()) }
+
+    var silenceMode: String
+        get() = sharedPrefs.getString("silent_mode_set_to", 0.toString())
+        set(value) = sharedPrefs.edit { putString("silent_mode_set_to", value) }
 
     var newsAlert: NewsAlert?
         get() = fetchNewsAlert()

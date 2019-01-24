@@ -10,6 +10,8 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.BatteryManager
 import android.os.Build
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.N
 import android.preference.PreferenceManager
 import android.text.Html
 import android.text.Spanned
@@ -62,35 +64,6 @@ object Utils {
     }
 
     /**
-     * Get a value from the default shared preferences
-     *
-     * @param c          Context
-     * @param key        setting name
-     * @param defaultVal default value
-     * @return setting value, defaultVal if undefined
-     */
-    @Deprecated("Move to AppConfig once WorkManager PR is merged")
-    @JvmStatic
-    fun getSetting(c: Context, key: String, defaultVal: String): String {
-        val sp = PreferenceManager.getDefaultSharedPreferences(c)
-        return sp.getString(key, defaultVal)!!
-    }
-
-    /**
-     * Return the boolean value of a setting.
-     *
-     * @param c          Context
-     * @param name       setting name
-     * @param defaultVal default value
-     * @return true if setting was checked, else value
-     */
-    @JvmStatic
-    fun getSettingBool(c: Context, name: String, defaultVal: Boolean): Boolean {
-        return PreferenceManager.getDefaultSharedPreferences(c)
-                .getBoolean(name, defaultVal)
-    }
-
-    /**
      * Logs an exception and additional information
      * Use this anywhere in the app when a fatal error occurred.
      * If you can give a better description of what went wrong
@@ -100,7 +73,7 @@ object Utils {
      */
     @JvmStatic
     fun log(t: Throwable) {
-        try {
+        try {s
             StringWriter().use { sw ->
                 t.printStackTrace(PrintWriter(sw))
                 val s = Thread.currentThread()
@@ -351,10 +324,11 @@ object Utils {
     @TargetApi(Build.VERSION_CODES.N)
     @Suppress("deprecation")
     fun fromHtml(source: String): Spanned {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+        return if (SDK_INT >= N) {
             Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY)
-        else
+        } else {
             Html.fromHtml(source)
+        }
     }
 
     @JvmStatic
@@ -395,4 +369,5 @@ object Utils {
         icon.draw(canvas)
         return bitmap
     }
+
 }
