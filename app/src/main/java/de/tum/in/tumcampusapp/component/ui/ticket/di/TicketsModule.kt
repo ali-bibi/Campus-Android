@@ -5,18 +5,28 @@ import dagger.Module
 import dagger.Provides
 import de.tum.`in`.tumcampusapp.api.app.TUMCabeClient
 import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
+import de.tum.`in`.tumcampusapp.component.ui.ticket.EventsDownloadAction
 import de.tum.`in`.tumcampusapp.component.ui.ticket.repository.EventsLocalRepository
 import de.tum.`in`.tumcampusapp.component.ui.ticket.repository.EventsRemoteRepository
 import de.tum.`in`.tumcampusapp.component.ui.ticket.repository.TicketsLocalRepository
 import de.tum.`in`.tumcampusapp.component.ui.ticket.repository.TicketsRemoteRepository
 import de.tum.`in`.tumcampusapp.database.TcaDb
+import de.tum.`in`.tumcampusapp.service.DownloadWorker
 
 @Module
-class TicketsModule(private val context: Context) {
+class TicketsModule {
+
+    @Provides
+    fun provideTicketsLocalRepository(
+            database: TcaDb
+    ): TicketsLocalRepository {
+        return TicketsLocalRepository(database)
+    }
 
     @Provides
     fun provideEventsRemoteRepository(
             appConfig: AppConfig,
+            context: Context,
             tumCabeClient: TUMCabeClient,
             eventsLocalRepository: EventsLocalRepository,
             ticketsLocalRepository: TicketsLocalRepository,
@@ -27,10 +37,8 @@ class TicketsModule(private val context: Context) {
     }
 
     @Provides
-    fun provideTicketsLocalRepository(
-            database: TcaDb
-    ): TicketsLocalRepository {
-        return TicketsLocalRepository(database)
-    }
+    fun provideEventsDownloadAction(
+            remoteRepository: EventsRemoteRepository
+    ): DownloadWorker.Action = EventsDownloadAction(remoteRepository)
 
 }

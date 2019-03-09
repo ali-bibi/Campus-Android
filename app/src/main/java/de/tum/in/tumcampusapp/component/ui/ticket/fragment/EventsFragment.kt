@@ -17,7 +17,7 @@ import de.tum.`in`.tumcampusapp.component.ui.chat.model.ChatMember
 import de.tum.`in`.tumcampusapp.component.ui.ticket.EventsViewModel
 import de.tum.`in`.tumcampusapp.component.ui.ticket.EventsViewState
 import de.tum.`in`.tumcampusapp.component.ui.ticket.adapter.EventsAdapter
-import de.tum.`in`.tumcampusapp.component.ui.ticket.di.TicketsModule
+import de.tum.`in`.tumcampusapp.component.ui.ticket.di.EventsModule
 import de.tum.`in`.tumcampusapp.component.ui.ticket.model.EventType
 import de.tum.`in`.tumcampusapp.di.ViewModelFactory
 import de.tum.`in`.tumcampusapp.di.injector
@@ -49,10 +49,9 @@ class EventsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        injector.ticketsComponent()
-                .ticketsModule(TicketsModule(requireContext()))
+        injector.eventsComponent()
+                .eventsModule(EventsModule())
                 .eventType(eventType)
-                .eventId(0) // not relevant here
                 .build()
                 .inject(this)
     }
@@ -87,7 +86,7 @@ class EventsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private fun render(viewState: EventsViewState) {
         val isEmpty = viewState.events.isEmpty()
         eventsRecyclerView.visibility = if (isEmpty) View.GONE else View.VISIBLE
-        placeholderTextView.visibility = if (isEmpty) View.VISIBLE else View.GONE
+        eventPlaceholder.visibility = if (isEmpty) View.VISIBLE else View.GONE
 
         eventsRefreshLayout.isRefreshing = false
 
@@ -95,7 +94,8 @@ class EventsFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
             val adapter = eventsRecyclerView.adapter as EventsAdapter
             adapter.update(viewState.events)
         } else {
-            placeholderTextView.setText(eventType.placeholderResId)
+            placeholderTextView.setText(eventType.placeholderTextId)
+            placeholderImage.setImageResource(eventType.placeholderImageId)
         }
 
         eventsRefreshLayout.isRefreshing = viewState.isLoading

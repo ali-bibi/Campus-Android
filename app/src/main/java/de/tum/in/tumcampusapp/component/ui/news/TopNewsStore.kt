@@ -2,6 +2,10 @@ package de.tum.`in`.tumcampusapp.component.ui.news
 
 import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.ui.news.model.NewsAlert
+import de.tum.`in`.tumcampusapp.component.ui.overview.CardManager
+import de.tum.`in`.tumcampusapp.utils.Const
+import de.tum.`in`.tumcampusapp.utils.DateTimeUtils
+import org.joda.time.DateTime
 import javax.inject.Inject
 
 /**
@@ -44,6 +48,7 @@ interface TopNewsStore {
 class RealTopNewsStore @Inject constructor(
         private val appConfig: AppConfig
 ) : TopNewsStore {
+
 
     override fun isEnabled(): Boolean = appConfig.showTopNews
 

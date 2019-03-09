@@ -1,32 +1,28 @@
 package de.tum.`in`.tumcampusapp.service
 
-import android.Manifest
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.app.IntentService
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.location.Criteria
-import android.location.LocationManager
-import android.net.wifi.ScanResult
-import android.net.wifi.WifiManager
+import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.net.wifi.WifiManager.SCAN_RESULTS_AVAILABLE_ACTION
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.checkSelfPermission
 import de.tum.`in`.tumcampusapp.R
-import de.tum.`in`.tumcampusapp.component.other.wifimeasurement.WifiMeasurementLocationListener
-import de.tum.`in`.tumcampusapp.component.other.wifimeasurement.model.WifiMeasurement
 import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.ui.eduroam.EduroamController
 import de.tum.`in`.tumcampusapp.component.ui.eduroam.SetupEduroamActivity
 import de.tum.`in`.tumcampusapp.di.app
+import de.tum.`in`.tumcampusapp.di.injector
 import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.NetUtils
-import de.tum.`in`.tumcampusapp.utils.Utils
-import org.jetbrains.anko.defaultSharedPreferences
-import org.jetbrains.anko.locationManager
 import org.jetbrains.anko.notificationManager
 import org.jetbrains.anko.wifiManager
+import javax.inject.Inject
+
 
 /**
  * Listens for android's ScanResultsAvailable broadcast and checks if eduroam is nearby.
@@ -34,9 +30,8 @@ import org.jetbrains.anko.wifiManager
  */
 class ScanResultsAvailableReceiver : BroadcastReceiver() {
 
-    private var locationManager: LocationManager? = null
-
-    private lateinit var appConfig: AppConfig
+    @Inject
+    lateinit var appConfig: AppConfig
 
     /**
      * This method either gets called by broadcast directly or gets repeatedly triggered by the
@@ -46,36 +41,30 @@ class ScanResultsAvailableReceiver : BroadcastReceiver() {
      * interval.
      */
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != WifiManager.SCAN_RESULTS_AVAILABLE_ACTION) {
+        context.app.appComponent.inject(this)
+
+        if (intent.action != SCAN_RESULTS_AVAILABLE_ACTION) {
             return
         }
 
-        WifiScanHandler.getInstance().onScanFinished()
-
-        //Check if wifi is turned on at all
-        val wifiManager = context.wifiManager
-        if (!wifiManager.isWifiEnabled) {
+        if (!context.wifiManager.isWifiEnabled) {
             return
         }
 
-        locationManager = context.locationManager
         appConfig = AppConfig(context)
 
-        //Check if locations are enabled
-        val locationsEnabled = ContextCompat.checkSelfPermission(
-                context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val locationsEnabled = checkSelfPermission(context, ACCESS_FINE_LOCATION) == PERMISSION_GRANTED
         if (!locationsEnabled) {
-            //Stop here as wifi.getScanResults will either return an empty list or throw an exception (on android 6.0.0)
+            // Stop here as wifi.getScanResults will either return an empty list or throw an
+            // exception (on android 6.0.0)
             return
         }
 
         // Test if user has eduroam configured already
-        val isEduroamConfigured = EduroamController.getEduroamConfig(context) != null || NetUtils.isConnected(context)
+        val isEduroamConfigured = EduroamController.getEduroamConfig(context) != null
+                || NetUtils.isConnected(context)
 
-        val wifiScansEnabled = appConfig.isWifiScanEnabled
-        var nextScanScheduled = false
-
-        wifiManager.scanResults.forEach { network ->
+        context.wifiManager.scanResults.forEach { network ->
             if (network.SSID != Const.EDUROAM_SSID && network.SSID != Const.LRZ) {
                 return@forEach
             }
@@ -83,62 +72,19 @@ class ScanResultsAvailableReceiver : BroadcastReceiver() {
             if (network.SSID == Const.EDUROAM_SSID && !isEduroamConfigured) {
                 showNotification(context)
             }
-
-            if (wifiScansEnabled) {
-                storeWifiMeasurement(context, network)
-                nextScanScheduled = true
-            }
         }
 
-        if (nextScanScheduled) {
-            //WIFI_SCAN_MINIMUM_BATTERY_LEVEL is used to decide, whether another Wifi-Scan is initiated on
-            //encountering an eduroam/lrz network. If the battery is lower, no new automatic scan will be
-            //scheduled. This setting can be used as additional way to limit battery consumption and leaves
-            //the user more freedom in deciding, when to scan.
-            val currentBattery = Utils.getBatteryLevel(context)
-            val minimumBattery = appConfig.wifiScanMinimumBattery
-
-            if (currentBattery > minimumBattery) {
-                Utils.log("WifiScanHandler rescheduled")
-            } else {
-                Utils.log("WifiScanHandler stopped")
-            }
-        }
-
-        //???
-        if (appConfig.showWifiSetupNotification.not()) {
-            appConfig.showWifiSetupNotification = true
-        }
-    }
-
-    /**
-     * This method stores wifi scan results to the server. When they first get created by the
-     * ScanResultsAvailable's onReceive method, they lack gps information for creating a heatmap.
-     * Therefore we request an update from the WifiMeasurementLocationListener, passing the incomplete WifiMeasurement.
-     * The WifiMeasurementLocationListener then takes care of adding the location information, whenever it is ready.
-     *
-     * @param context
-     * @param scanResult
-     */
-
-    @Throws(SecurityException::class)
-    private fun storeWifiMeasurement(context: Context, scanResult: ScanResult) {
-        val criteria = Criteria().apply {
-            horizontalAccuracy = Criteria.ACCURACY_FINE
-            isBearingRequired = false
-            isAltitudeRequired = false
-            isSpeedRequired = false
-        }
-
-        val wifiMeasurement = WifiMeasurement.fromScanResult(scanResult)
-        val listener = WifiMeasurementLocationListener(context, wifiMeasurement, System.currentTimeMillis())
-        locationManager?.requestSingleUpdate(criteria, listener, null)
+        appConfig.showWifiSetupNotification = true
     }
 
     class NeverShowAgainService : IntentService(NEVER_SHOW) {
 
-        private val appConfig: AppConfig by lazy {
-            AppConfig(this)
+        @Inject
+        lateinit var appConfig: AppConfig
+
+        override fun onCreate() {
+            super.onCreate()
+            injector.inject(this)
         }
 
         override fun onHandleIntent(intent: Intent) {
@@ -148,7 +94,6 @@ class ScanResultsAvailableReceiver : BroadcastReceiver() {
         companion object {
             private const val NEVER_SHOW = "never_show"
         }
-
     }
 
     companion object {
@@ -160,7 +105,8 @@ class ScanResultsAvailableReceiver : BroadcastReceiver() {
          *
          * @param context Context
          */
-        @JvmStatic fun showNotification(context: Context) {
+        @JvmStatic
+        fun showNotification(context: Context) {
             // If previous notification is still visible
             val appConfig = AppConfig(context)
             if (appConfig.showWifiSetupNotification.not()) {
@@ -188,9 +134,7 @@ class ScanResultsAvailableReceiver : BroadcastReceiver() {
                     .build()
 
             // Create FcmNotification Manager
-            val notificationManager = context.notificationManager
-            notificationManager.notify(NOTIFICATION_ID, notification)
-
+            context.notificationManager.notify(NOTIFICATION_ID, notification)
             appConfig.showWifiSetupNotification = false
         }
 
