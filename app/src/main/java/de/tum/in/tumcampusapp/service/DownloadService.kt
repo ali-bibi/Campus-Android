@@ -280,7 +280,8 @@ class DownloadService : JobIntentService() {
                 }
 
                 if (success) {
-                    Utils.setSetting(service, LAST_UPDATE, System.currentTimeMillis())
+                    val appConfig = AppConfig(service)
+                    appConfig.lastUpdate = System.currentTimeMillis()
                 }
 
                 success = true

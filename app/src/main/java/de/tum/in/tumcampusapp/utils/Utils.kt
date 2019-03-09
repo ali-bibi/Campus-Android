@@ -12,14 +12,12 @@ import android.os.BatteryManager
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.N
-import android.preference.PreferenceManager
 import android.text.Html
 import android.text.Spanned
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.PackageInfoCompat
-import com.google.gson.Gson
 import de.tum.`in`.tumcampusapp.BuildConfig
 import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import org.jetbrains.anko.defaultSharedPreferences
@@ -73,7 +71,7 @@ object Utils {
      */
     @JvmStatic
     fun log(t: Throwable) {
-        try {s
+        try {
             StringWriter().use { sw ->
                 t.printStackTrace(PrintWriter(sw))
                 val s = Thread.currentThread()
@@ -176,34 +174,6 @@ object Utils {
             log(e)
             emptyList()
         }
-    }
-
-    /**
-     * Sets the value of a setting
-     *
-     * @param c   Context
-     * @param key setting key
-     */
-    @JvmStatic
-    fun setSetting(c: Context, key: String, value: Boolean) {
-        val sp = PreferenceManager.getDefaultSharedPreferences(c)
-        sp.edit()
-                .putBoolean(key, value)
-                .apply()
-    }
-
-    /**
-     * Sets the value of a setting
-     *
-     * @param c   Context
-     * @param key setting key
-     */
-    @JvmStatic
-    fun setSetting(c: Context, key: String, value: Any) {
-        val sp = PreferenceManager.getDefaultSharedPreferences(c)
-        sp.edit()
-                .putString(key, Gson().toJson(value))
-                .apply()
     }
 
     /**

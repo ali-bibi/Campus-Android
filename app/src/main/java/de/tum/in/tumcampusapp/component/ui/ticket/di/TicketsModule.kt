@@ -4,6 +4,7 @@ import android.content.Context
 import dagger.Module
 import dagger.Provides
 import de.tum.`in`.tumcampusapp.api.app.TUMCabeClient
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.ui.ticket.repository.EventsLocalRepository
 import de.tum.`in`.tumcampusapp.component.ui.ticket.repository.EventsRemoteRepository
 import de.tum.`in`.tumcampusapp.component.ui.ticket.repository.TicketsLocalRepository
@@ -15,12 +16,13 @@ class TicketsModule(private val context: Context) {
 
     @Provides
     fun provideEventsRemoteRepository(
+            appConfig: AppConfig,
             tumCabeClient: TUMCabeClient,
             eventsLocalRepository: EventsLocalRepository,
             ticketsLocalRepository: TicketsLocalRepository,
             ticketsRemoteRepository: TicketsRemoteRepository
     ): EventsRemoteRepository {
-        return EventsRemoteRepository(context, tumCabeClient,
+        return EventsRemoteRepository(context, appConfig, tumCabeClient,
                 eventsLocalRepository, ticketsLocalRepository, ticketsRemoteRepository)
     }
 
