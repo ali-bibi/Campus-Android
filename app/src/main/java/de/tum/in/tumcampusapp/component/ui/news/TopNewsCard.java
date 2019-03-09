@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import de.tum.in.tumcampusapp.R;
 import de.tum.in.tumcampusapp.component.other.navigation.NavigationDestination;
 import de.tum.in.tumcampusapp.component.other.navigation.SystemIntent;
+import de.tum.in.tumcampusapp.component.prefs.AppConfig;
 import de.tum.in.tumcampusapp.component.ui.news.model.NewsAlert;
 import de.tum.in.tumcampusapp.component.ui.overview.CardManager;
 import de.tum.in.tumcampusapp.component.ui.overview.card.Card;
@@ -37,7 +37,7 @@ public class TopNewsCard extends Card {
 
     public TopNewsCard(Context context) {
         super(CardManager.CARD_TOP_NEWS, context, "top_news");
-        this.topNewsStore = new RealTopNewsStore(PreferenceManager.getDefaultSharedPreferences(context));
+        this.topNewsStore = new RealTopNewsStore(new AppConfig(context));
         this.newsAlert = topNewsStore.getNewsAlert();
     }
 

@@ -11,22 +11,35 @@ import de.tum.`in`.tumcampusapp.component.ui.chat.ChatMessageViewModel
 import de.tum.`in`.tumcampusapp.component.ui.chat.repository.ChatMessageLocalRepository
 import de.tum.`in`.tumcampusapp.component.ui.chat.repository.ChatMessageRemoteRepository
 import de.tum.`in`.tumcampusapp.database.TcaDb
+import de.tum.`in`.tumcampusapp.di.injector
 import de.tum.`in`.tumcampusapp.utils.Utils
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 /**
  * Service used to send chat messages.
  */
-class SendMessageWorker(context: Context, workerParams: WorkerParameters) :
-        Worker(context, workerParams) {
+class SendMessageWorker(
+        context: Context,
+        workerParams: WorkerParameters
+) : Worker(context, workerParams) {
 
-    private val tcaDb by lazy { TcaDb.getInstance(applicationContext) }
-    private val tumCabeClient by lazy { TUMCabeClient.getInstance(applicationContext) }
-    private val authenticationManager by lazy { AuthenticationManager(applicationContext) }
+    @Inject
+    lateinit var database: TcaDb
+
+    @Inject
+    lateinit var tumCabeClient: TUMCabeClient
+
+    @Inject
+    lateinit var authManager: AuthenticationManager
+
+    init {
+        injector.inject(this)
+    }
 
     override fun doWork(): ListenableWorker.Result {
         ChatMessageRemoteRepository.tumCabeClient = tumCabeClient
-        ChatMessageLocalRepository.db = tcaDb
+        ChatMessageLocalRepository.db = database
 
         val viewModel = ChatMessageViewModel(ChatMessageLocalRepository, ChatMessageRemoteRepository)
         viewModel.deleteOldEntries()
@@ -34,7 +47,7 @@ class SendMessageWorker(context: Context, workerParams: WorkerParameters) :
         return try {
             viewModel.getUnsent()
                     .asSequence()
-                    .onEach { it.signature = authenticationManager.sign(it.text) }
+                    .onEach { it.signature = authManager.sign(it.text) }
                     .forEach { viewModel.sendMessage(it.room, it, applicationContext) }
             success()
         } catch (noPrivateKey: NoPrivateKey) {
@@ -48,6 +61,7 @@ class SendMessageWorker(context: Context, workerParams: WorkerParameters) :
     }
 
     companion object {
+
         @JvmStatic
         fun getWorkRequest(): WorkRequest {
             val constraints = Constraints.Builder()
@@ -66,5 +80,7 @@ class SendMessageWorker(context: Context, workerParams: WorkerParameters) :
                     .setConstraints(constraints)
                     .build()
         }
+
     }
+
 }

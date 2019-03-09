@@ -11,6 +11,7 @@ import de.tum.`in`.tumcampusapp.api.app.TUMCabeClient
 import de.tum.`in`.tumcampusapp.api.tumonline.TUMOnlineClient
 import de.tum.`in`.tumcampusapp.component.notifications.NotificationScheduler
 import de.tum.`in`.tumcampusapp.component.other.locations.LocationManager
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.ui.news.RealTopNewsStore
 import de.tum.`in`.tumcampusapp.component.ui.news.TopNewsStore
 import de.tum.`in`.tumcampusapp.component.ui.overview.CardsRepository
@@ -41,8 +42,8 @@ class AppModule(private val context: Context) {
     @Singleton
     @Provides
     fun provideTopNewsStore(
-            sharedPrefs: SharedPreferences
-    ): TopNewsStore = RealTopNewsStore(sharedPrefs)
+            appConfig: AppConfig
+    ): TopNewsStore = RealTopNewsStore(appConfig)
 
     @Singleton
     @Provides

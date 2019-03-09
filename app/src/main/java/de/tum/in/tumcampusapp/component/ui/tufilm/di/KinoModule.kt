@@ -4,6 +4,7 @@ import android.content.Context
 import dagger.Module
 import dagger.Provides
 import de.tum.`in`.tumcampusapp.api.app.TUMCabeClient
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.ui.ticket.repository.EventsLocalRepository
 import de.tum.`in`.tumcampusapp.component.ui.ticket.repository.EventsRemoteRepository
 import de.tum.`in`.tumcampusapp.component.ui.ticket.repository.TicketsLocalRepository
@@ -38,6 +39,7 @@ class KinoModule {
     @Provides
     fun provideEventsRemoteRepository(
             context: Context,
+            appConfig: AppConfig,
             tumCabeClient: TUMCabeClient,
             eventsLocalRepository: EventsLocalRepository,
             ticketsLocalRepository: TicketsLocalRepository,
@@ -45,6 +47,7 @@ class KinoModule {
     ): EventsRemoteRepository {
         return EventsRemoteRepository(
                 context,
+                appConfig,
                 tumCabeClient,
                 eventsLocalRepository,
                 ticketsLocalRepository,

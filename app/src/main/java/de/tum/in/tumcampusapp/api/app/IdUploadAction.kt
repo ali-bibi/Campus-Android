@@ -1,10 +1,9 @@
 package de.tum.`in`.tumcampusapp.api.app
 
-import android.content.Context
 import de.tum.`in`.tumcampusapp.api.app.model.UploadStatus
 import de.tum.`in`.tumcampusapp.api.tumonline.CacheControl
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.service.DownloadWorker
-import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.Utils
 import javax.inject.Inject
 
@@ -12,13 +11,13 @@ import javax.inject.Inject
  * Asks to verify private key, uploads fcm token and obfuscated ids (if missing)
  */
 class IdUploadAction @Inject constructor(
-        private val context: Context,
+        private val appConfig: AppConfig,
         private val authManager: AuthenticationManager,
         private val tumCabeClient: TUMCabeClient
 ) : DownloadWorker.Action {
 
     override fun execute(cacheBehaviour: CacheControl) {
-        val lrzId = Utils.getSetting(context, Const.LRZ_ID, "")
+        val lrzId = appConfig.lrzId
 
         val uploadStatus = tumCabeClient.getUploadStatus(lrzId) ?: return
         Utils.log("upload missing ids: " + uploadStatus.toString())
@@ -29,7 +28,7 @@ class IdUploadAction @Inject constructor(
             authManager.tryToUploadFcmToken()
         }
 
-        if (lrzId.isEmpty()) {
+        if (lrzId == null) {
             return // nothing else to be done
         }
 

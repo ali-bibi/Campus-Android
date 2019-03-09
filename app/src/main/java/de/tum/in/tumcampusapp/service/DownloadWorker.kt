@@ -9,6 +9,7 @@ import de.tum.`in`.tumcampusapp.api.tumonline.AccessTokenManager
 import de.tum.`in`.tumcampusapp.api.tumonline.CacheControl
 import de.tum.`in`.tumcampusapp.api.tumonline.CacheControl.BYPASS_CACHE
 import de.tum.`in`.tumcampusapp.api.tumonline.CacheControl.USE_CACHE
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.di.injector
 import de.tum.`in`.tumcampusapp.service.di.DownloadModule
 import de.tum.`in`.tumcampusapp.utils.CacheManager
@@ -24,6 +25,9 @@ class DownloadWorker(
     @Inject
     lateinit var downloadActions: DownloadWorker.WorkerActions
 
+    @Inject
+    lateinit var appConfig: AppConfig
+
     init {
         Utils.log("DownloadService service has started")
         injector.downloadComponent()
@@ -35,7 +39,7 @@ class DownloadWorker(
     override fun doWork(): Result {
         return try {
             download(inputData, this)
-            Utils.setSetting(applicationContext, LAST_UPDATE, System.currentTimeMillis())
+            appConfig.lastUpdate = System.currentTimeMillis()
             success()
         } catch (e: Exception) {
             Utils.log(e)
@@ -94,7 +98,7 @@ class DownloadWorker(
          * @return time when BackgroundService was executed last time
          */
         @JvmStatic
-        fun lastUpdate(context: Context) = Utils.getSettingLong(context, LAST_UPDATE, 0L)
+        fun lastUpdate(context: Context) = AppConfig(context).lastUpdate
 
         /**
          * Download the data for a specific intent

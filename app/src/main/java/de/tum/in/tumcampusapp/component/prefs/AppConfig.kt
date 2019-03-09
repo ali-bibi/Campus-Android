@@ -2,7 +2,6 @@ package de.tum.`in`.tumcampusapp.component.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.media.AudioManager
 import android.media.AudioManager.RINGER_MODE_NORMAL
 import androidx.core.content.edit
 import com.google.gson.Gson
@@ -165,14 +164,6 @@ class AppConfig @Inject constructor(
         get() = sharedPrefs.getString(Const.KEY_CARD_HOLDER, "")
         set(value) = sharedPrefs.edit { putString(Const.KEY_CARD_HOLDER, value) }
 
-    var isWifiScanEnabled: Boolean
-        get() = sharedPrefs.getBoolean(Const.WIFI_SCANS_ALLOWED, false)
-        set(value) = sharedPrefs.edit { putBoolean(Const.WIFI_SCANS_ALLOWED, value) }
-
-    var wifiScanMinimumBattery: Float
-        get() = sharedPrefs.getFloat(Const.WIFI_SCAN_MINIMUM_BATTERY_LEVEL, 50f)
-        set(value) = sharedPrefs.edit { putFloat(Const.WIFI_SCAN_MINIMUM_BATTERY_LEVEL, value) }
-
     var showWifiSetupNotification: Boolean
         get() = sharedPrefs.getBoolean("wifi_setup_notification_dismissed", true)
         set(value) = sharedPrefs.edit { putBoolean("wifi_setup_notification_dismissed", value) }
@@ -233,7 +224,7 @@ class AppConfig @Inject constructor(
         set(value) = sharedPrefs.edit { putLong("last_update", value) }
 
     var showTopNews: Boolean
-        get() = sharedPrefs.getBoolean("show_top_news", true)
+        get() = sharedPrefs.getBoolean("show_top_news", false)
         set(value) = sharedPrefs.edit { putBoolean("show_top_news", value) }
 
     private var newsAlertUntil: String?

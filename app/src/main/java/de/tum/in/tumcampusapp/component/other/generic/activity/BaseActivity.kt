@@ -40,7 +40,7 @@ import java.util.*
 abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity(),
         SharedPreferences.OnSharedPreferenceChangeListener {
 
-    protected val injector: AppComponent by lazy { app.appComponent }
+    val injector: AppComponent by lazy { app.appComponent }
 
     protected val appConfig: AppConfig by lazy {
         AppConfig(this)

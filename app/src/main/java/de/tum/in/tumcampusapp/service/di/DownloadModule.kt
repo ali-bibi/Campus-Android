@@ -10,6 +10,7 @@ import de.tum.`in`.tumcampusapp.api.app.IdUploadAction
 import de.tum.`in`.tumcampusapp.api.app.TUMCabeClient
 import de.tum.`in`.tumcampusapp.api.tumonline.TUMOnlineClient
 import de.tum.`in`.tumcampusapp.component.notifications.NotificationScheduler
+import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.tumui.grades.GradesBackgroundUpdater
 import de.tum.`in`.tumcampusapp.component.tumui.grades.GradesDownloadAction
 import de.tum.`in`.tumcampusapp.component.tumui.grades.GradesStore
@@ -99,10 +100,10 @@ class DownloadModule {
 
     @Provides
     fun provideIdUploadAction(
-            context: Context,
+            appConfig: AppConfig,
             authManager: AuthenticationManager,
             tumCabeClient: TUMCabeClient
-    ): IdUploadAction = IdUploadAction(context, authManager, tumCabeClient)
+    ): IdUploadAction = IdUploadAction(appConfig, authManager, tumCabeClient)
 
     @Provides
     fun provideNewsDownloadAction(

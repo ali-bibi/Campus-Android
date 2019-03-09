@@ -1,29 +1,41 @@
 package de.tum.`in`.tumcampusapp.service
 
 import android.app.AlarmManager
-import android.app.NotificationManager
 import android.app.NotificationManager.INTERRUPTION_FILTER_ALL
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.os.Build
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.M
+import android.os.Build.VERSION_CODES.N
 import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.core.app.JobIntentService
 import de.tum.`in`.tumcampusapp.component.prefs.AppConfig
 import de.tum.`in`.tumcampusapp.component.tumui.calendar.CalendarController
+import de.tum.`in`.tumcampusapp.component.tumui.calendar.di.CalendarModule
+import de.tum.`in`.tumcampusapp.di.injector
 import de.tum.`in`.tumcampusapp.utils.Const.SILENCE_SERVICE_JOB_ID
 import de.tum.`in`.tumcampusapp.utils.Utils
+import org.jetbrains.anko.alarmManager
+import org.jetbrains.anko.audioManager
 import org.jetbrains.anko.notificationManager
 import org.joda.time.DateTime
+import javax.inject.Inject
+import kotlin.math.min
 
 /**
  * Service used to silence the mobile during lectures
  */
 class SilenceService : JobIntentService() {
 
-    private val appConfig: AppConfig by lazy { AppConfig(this) }
+    @Inject
+    lateinit var appConfig: AppConfig
+
+    @Inject
+    lateinit var calendarController: CalendarController
 
     /**
      * We can't and won't change the ringer modes, if the device is in DoNotDisturb mode. DnD requires
@@ -50,6 +62,10 @@ class SilenceService : JobIntentService() {
     override fun onCreate() {
         super.onCreate()
         Utils.log("SilenceService has started")
+        injector.calendarComponent()
+                .calendarModule(CalendarModule())
+                .build()
+                .inject(this)
     }
 
     override fun onDestroy() {
@@ -69,7 +85,6 @@ class SilenceService : JobIntentService() {
             return
         }
 
-        val alarmManager = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val newIntent = Intent(this, SilenceService::class.java)
         val pendingIntent = PendingIntent.getService(this, 0, newIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
@@ -77,14 +92,12 @@ class SilenceService : JobIntentService() {
         var waitDuration = CHECK_INTERVAL.toLong()
         Utils.log("SilenceService enabled, checking for lectures …")
 
-        val calendarController = CalendarController(this)
         if (!calendarController.hasLectures()) {
             Utils.logv("No lectures available")
             alarmManager.set(AlarmManager.RTC, startTime + waitDuration, pendingIntent)
             return
         }
 
-        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val currentLectures = calendarController.currentFromDb
         Utils.log("Current lectures: " + currentLectures.size)
 
@@ -139,7 +152,7 @@ class SilenceService : JobIntentService() {
 
         private fun getWaitDuration(eventDateTime: DateTime): Long {
             val eventTime = eventDateTime.millis
-            return Math.min(CHECK_INTERVAL.toLong(), eventTime - System.currentTimeMillis() + CHECK_DELAY)
+            return min(CHECK_INTERVAL.toLong(), eventTime - System.currentTimeMillis() + CHECK_DELAY)
         }
 
         @JvmStatic fun enqueueWork(context: Context, work: Intent) {
@@ -150,18 +163,14 @@ class SilenceService : JobIntentService() {
          * Check if the app has the permissions to enable "Do Not Disturb".
          */
         @JvmStatic fun hasPermissions(context: Context): Boolean {
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            return !(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !notificationManager.isNotificationPolicyAccessGranted)
+            return !(SDK_INT >= N && !context.notificationManager.isNotificationPolicyAccessGranted)
         }
 
         /**
          * Request the "Do Not Disturb" permissions for android version >= N.
          */
         @JvmStatic fun requestPermissions(context: Context) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                return
-            }
-            if (hasPermissions(context)) {
+            if (hasPermissions(context) || SDK_INT < M) {
                 return
             }
             requestPermissionsSDK23(context)
