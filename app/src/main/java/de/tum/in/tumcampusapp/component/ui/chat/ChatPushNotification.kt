@@ -30,6 +30,7 @@ import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.Utils
 import de.tum.`in`.tumcampusapp.utils.tryOrNull
 import org.jetbrains.anko.notificationManager
+import timber.log.Timber
 
 /**
  * Creates/modifies the notificationId when there is a new chat message.
@@ -59,7 +60,7 @@ class ChatPushNotification(private val fcmChatPayload: FcmChat, context: Context
     override val displayNotificationId = (fcmChatPayload.room shl 4) + NOTIFICATION_ID
 
     init {
-        Utils.logv("Received GCM notificationId: room=${fcmChatPayload.room} " +
+        Timber.d("Received GCM notificationId: room=${fcmChatPayload.room} " +
                 "member=${fcmChatPayload.member} message=${fcmChatPayload.message}")
 
         // Get the data necessary for the ChatActivity
@@ -79,12 +80,12 @@ class ChatPushNotification(private val fcmChatPayload: FcmChat, context: Context
         if (messageId == -1) {
             chatMessageViewModel
                     .getNewMessages(chatRoom, verification)
-                    .subscribe({ onDataLoaded() }, { Utils.log(it) })
+                    .subscribe({ onDataLoaded() }, Timber::e)
             return
         }
         chatMessageViewModel
                 .getOlderMessages(chatRoom, messageId.toLong(), verification)
-                .subscribe({ /* Free ad space */ }, { Utils.log(it) })
+                .subscribe({ /* Free ad space */ }, Timber::e)
     }
 
     /**

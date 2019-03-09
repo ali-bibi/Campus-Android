@@ -37,6 +37,7 @@ import de.tum.in.tumcampusapp.utils.Utils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 /**
  * Allows the user to create (and edit) a private event in TUMonline.
@@ -237,7 +238,7 @@ public class CreateEventActivity extends ActivityForAccessingTumOnline<CreateEve
                     public void onResponse(@NonNull Call<DeleteEventResponse> call,
                                            @NonNull Response<DeleteEventResponse> response) {
                         if (response.isSuccessful()) {
-                            Utils.log("Event successfully deleted (now creating the edited version)");
+                            Timber.d("Event successfully deleted (now creating the edited version)");
                             TcaDb.getInstance(CreateEventActivity.this).calendarDao().delete(eventId);
                             createEvent();
                         } else {
@@ -248,7 +249,7 @@ public class CreateEventActivity extends ActivityForAccessingTumOnline<CreateEve
                     @Override
                     public void onFailure(@NonNull Call<DeleteEventResponse> call,
                                           @NonNull Throwable t) {
-                        Utils.log(t);
+                        Timber.e(t);
                         displayErrorMessage(t);
                     }
                 });

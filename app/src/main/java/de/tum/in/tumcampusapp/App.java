@@ -12,6 +12,8 @@ import de.tum.in.tumcampusapp.component.notifications.NotificationUtils;
 import de.tum.in.tumcampusapp.di.AppComponent;
 import de.tum.in.tumcampusapp.di.AppModule;
 import de.tum.in.tumcampusapp.di.DaggerAppComponent;
+import de.tum.in.tumcampusapp.utils.ReleaseTree;
+import timber.log.Timber;
 
 public class App extends Application {
 
@@ -25,6 +27,7 @@ public class App extends Application {
         NotificationUtils.setupNotificationChannels(this);
         JodaTimeAndroid.init(this);
         setupStrictMode();
+        setupTimber();
     }
 
     private void buildAppComponent() {
@@ -63,6 +66,14 @@ public class App extends Application {
                                            //.detectUntaggedSockets()
                                            .penaltyLog()
                                            .build());
+        }
+    }
+
+    private void setupTimber() {
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        } else {
+            Timber.plant(new ReleaseTree());
         }
     }
 

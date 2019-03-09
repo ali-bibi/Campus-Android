@@ -29,7 +29,7 @@ import de.tum.in.tumcampusapp.api.app.TUMCabeClient;
 import de.tum.in.tumcampusapp.component.tumui.calendar.WidgetCalendarItem;
 import de.tum.in.tumcampusapp.component.tumui.roomfinder.model.RoomFinderSchedule;
 import de.tum.in.tumcampusapp.utils.Const;
-import de.tum.in.tumcampusapp.utils.Utils;
+import timber.log.Timber;
 
 public class WeekViewFragment extends Fragment
         implements MonthLoader.MonthChangeListener<WidgetCalendarItem> {
@@ -125,7 +125,7 @@ public class WeekViewFragment extends Fragment
 
             return events;
         } catch (Exception e) {
-            Utils.log(e);
+            Timber.e(e);
         }
 
         return Collections.emptyList();

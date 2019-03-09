@@ -6,6 +6,7 @@ import de.tum.`in`.tumcampusapp.api.tumonline.CacheControl
 import de.tum.`in`.tumcampusapp.service.DownloadWorker
 import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.Utils
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -21,11 +22,11 @@ class IdUploadAction @Inject constructor(
         val lrzId = Utils.getSetting(context, Const.LRZ_ID, "")
 
         val uploadStatus = tumCabeClient.getUploadStatus(lrzId) ?: return
-        Utils.log("upload missing ids: " + uploadStatus.toString())
+        Timber.d("upload missing ids: %s", uploadStatus.toString())
 
         // upload FCM Token if not uploaded or invalid
         if (uploadStatus.fcmToken != UploadStatus.UPLOADED) {
-            Utils.log("upload fcm token")
+            Timber.d("upload fcm token")
             authManager.tryToUploadFcmToken()
         }
 
@@ -35,7 +36,7 @@ class IdUploadAction @Inject constructor(
 
         // ask server to verify our key
         if (uploadStatus.publicKey == UploadStatus.UPLOADED) { // uploaded but not verified
-            Utils.log("ask server to verify key")
+            Timber.d("ask server to verify key")
             val keyStatus = tumCabeClient.verifyKey()
             if (keyStatus?.status != UploadStatus.VERIFIED) {
                 return // we can only upload obfuscated ids if we are verified

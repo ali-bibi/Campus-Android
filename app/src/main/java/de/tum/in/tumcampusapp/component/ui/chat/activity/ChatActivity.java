@@ -56,6 +56,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 import static android.os.Build.VERSION.SDK_INT;
 
@@ -151,7 +152,7 @@ public class ChatActivity extends ActivityForDownloadingExternal
     }
 
     private void handleBroadcastReceive(Intent intent) {
-        Utils.logv("Message sent. Trying to parse...");
+        Timber.d("Message sent. Trying to parse...");
 
         FcmChat chat = (FcmChat) intent.getSerializableExtra(Const.FCM_CHAT);
         if (chat != null) {
@@ -207,37 +208,6 @@ public class ChatActivity extends ActivityForDownloadingExternal
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
     }
 
-    /*
-     * Method to handle any incoming GCM/Firebase notifications
-     *
-     * @param extras model that contains infos about the message we should get
-     */
-    /*
-    private void handleRoomBroadcast(FcmChat extras) {
-        if (extras.getRoom() != currentChatRoom.getId() || chatHistoryAdapter == null) {
-            return;
-        }
-
-        if (extras.getMember() != currentChatMember.getId() && extras.getMessage() == -1) {
-            // This is a new message from a different user
-            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            if (am != null && am.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
-                // Play a notification sound
-                MediaPlayer mediaPlayer = MediaPlayer.create(ChatActivity.this, R.raw.message);
-                mediaPlayer.start();
-            } else if (am != null && am.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE) {
-                // Possibly only vibration is enabled
-                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                if (vibrator != null) {
-                    vibrator.vibrate(500);
-                }
-            }
-        }
-
-        getNextHistoryFromServer(true);
-    }
-    */
-
     /**
      * User pressed on the notification and wants to view the room with the new messages
      *
@@ -275,8 +245,6 @@ public class ChatActivity extends ActivityForDownloadingExternal
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int itemId = item.getItemId();
-
         switch (item.getItemId()) {
             case R.id.action_add_chat_member:
                 openAddChatMemberActivity();
@@ -336,7 +304,7 @@ public class ChatActivity extends ActivityForDownloadingExternal
 
                     @Override
                     public void onFailure(@NonNull Call<ChatRoom> call, @NonNull Throwable t) {
-                        Utils.log(t, "Failure leaving chat room");
+                        Timber.e(t, "Failure leaving chat room");
                         Utils.showToast(ChatActivity.this, R.string.error_something_wrong);
                     }
                 });
@@ -360,7 +328,6 @@ public class ChatActivity extends ActivityForDownloadingExternal
 
     @Override
     public void onRetrySending(ChatMessage message) {
-        //chatMessageViewModel.removeUnsent(message);
         message.setSendingStatus(ChatMessage.STATUS_SENDING);
         sendMessage(message.getText());
 
@@ -424,27 +391,13 @@ public class ChatActivity extends ActivityForDownloadingExternal
 
         if (hasNewMessage || chatHistoryAdapter.isEmpty()) {
             observable = chatMessageViewModel.getNewMessages(currentChatRoom, verification);
-            //chatMessageViewModel.getNewMessages(currentChatRoom.getId(), verification, this::onMessagesLoaded);
         } else {
             ChatMessage latestMessage = chatHistoryAdapter.getItem(0);
             long latestId = latestMessage.getId();
             observable = chatMessageViewModel.getOlderMessages(currentChatRoom, latestId, verification);
-            //chatMessageViewModel.getOlderMessages(currentChatRoom.getId(), latestId, verification, this::onMessagesLoaded);
         }
 
-        disposables.add(observable.subscribe(this::showMessages, Utils::log));
-
-        /*
-        new Thread(() -> {
-            // If currently nothing has been shown, load newest messages from server
-            if (chatHistoryAdapter == null || chatHistoryAdapter.getCount() == 0 || hasNewMessage) {
-                chatMessageViewModel.getNewMessages(currentChatRoom.getId(), verification, this::onMessagesLoaded);
-            } else {
-                long id = chatHistoryAdapter.getItemId(0);
-                chatMessageViewModel.getOlderMessages(currentChatRoom.getId(), id, verification, this::onMessagesLoaded);
-            }
-        }).start();
-        */
+        disposables.add(observable.subscribe(this::showMessages, Timber::e));
     }
 
     private void showMessages(List<ChatMessage> messages) {
@@ -467,30 +420,6 @@ public class ChatActivity extends ActivityForDownloadingExternal
             isLoadingMore = false;
         }
     }
-
-    /*
-    private void onMessagesLoaded() {
-        final List<ChatMessage> messages = chatMessageViewModel.getAll(currentChatRoom.getId());
-
-        // Update results in UI
-        runOnUiThread(() -> {
-            if (chatHistoryAdapter == null) {
-                chatHistoryAdapter = new ChatHistoryAdapter(ChatActivity.this, messages, currentChatMember);
-                messagesListView.setAdapter(chatHistoryAdapter);
-            } else {
-                chatHistoryAdapter.updateHistory(chatMessageViewModel.getAll(currentChatRoom.getId()));
-            }
-
-            // If all messages are loaded hide header view
-            if ((!messages.isEmpty() && messages.get(0)
-                                        .getPrevious() == 0) || chatHistoryAdapter.getCount() == 0) {
-                messagesListView.removeHeaderView(progressbar);
-            } else {
-                isLoadingMore = false;
-            }
-        });
-    }
-    */
 
     @Override
     protected void onDestroy() {

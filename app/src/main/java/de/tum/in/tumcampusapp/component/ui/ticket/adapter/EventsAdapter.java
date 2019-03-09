@@ -33,7 +33,7 @@ import de.tum.in.tumcampusapp.component.ui.ticket.model.EventItem;
 import de.tum.in.tumcampusapp.component.ui.ticket.repository.TicketsLocalRepository;
 import de.tum.in.tumcampusapp.database.TcaDb;
 import de.tum.in.tumcampusapp.utils.Const;
-import de.tum.in.tumcampusapp.utils.Utils;
+import timber.log.Timber;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -157,7 +157,7 @@ public class EventsAdapter extends RecyclerView.Adapter<CardViewHolder> {
 
                            @Override
                            public void onError(Exception e) {
-                               Utils.log(e);
+                               Timber.e(e);
                                progressBar.setVisibility(GONE);
                            }
                        });

@@ -14,8 +14,8 @@ import de.tum.in.tumcampusapp.R;
 import de.tum.in.tumcampusapp.api.app.TUMCabeClient;
 import de.tum.in.tumcampusapp.component.other.generic.activity.ActivityForLoadingInBackground;
 import de.tum.in.tumcampusapp.component.ui.barrierfree.model.BarrierfreeMoreInfo;
-import de.tum.in.tumcampusapp.utils.Utils;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
+import timber.log.Timber;
 
 public class BarrierFreeMoreInfoActivity
         extends ActivityForLoadingInBackground<Void, List<BarrierfreeMoreInfo>>
@@ -59,7 +59,7 @@ public class BarrierFreeMoreInfoActivity
             result = TUMCabeClient.getInstance(this)
                                   .getMoreInfoList();
         } catch (IOException e) {
-            Utils.log(e);
+            Timber.e(e);
             return result;
         }
         return result;

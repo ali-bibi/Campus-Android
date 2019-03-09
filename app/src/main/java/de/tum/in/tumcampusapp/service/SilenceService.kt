@@ -15,6 +15,7 @@ import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.Const.SILENCE_SERVICE_JOB_ID
 import de.tum.`in`.tumcampusapp.utils.Utils
 import org.joda.time.DateTime
+import timber.log.Timber
 
 /**
  * Service used to silence the mobile during lectures
@@ -46,12 +47,12 @@ class SilenceService : JobIntentService() {
 
     override fun onCreate() {
         super.onCreate()
-        Utils.log("SilenceService has started")
+        Timber.d("SilenceService has started")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Utils.log("SilenceService has stopped")
+        Timber.d("SilenceService has stopped")
     }
 
     override fun onHandleWork(intent: Intent) {
@@ -72,23 +73,23 @@ class SilenceService : JobIntentService() {
 
         val startTime = System.currentTimeMillis()
         var waitDuration = CHECK_INTERVAL.toLong()
-        Utils.log("SilenceService enabled, checking for lectures …")
+        Timber.d("SilenceService enabled, checking for lectures …")
 
         val calendarController = CalendarController(this)
         if (!calendarController.hasLectures()) {
-            Utils.logv("No lectures available")
+            Timber.d("No lectures available")
             alarmManager.set(AlarmManager.RTC, startTime + waitDuration, pendingIntent)
             return
         }
 
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val currentLectures = calendarController.currentFromDb
-        Utils.log("Current lectures: " + currentLectures.size)
+        Timber.d("Current lectures: %s", currentLectures.size)
 
         if (currentLectures.isEmpty() || isDoNotDisturbActive) {
             if (Utils.getSettingBool(this, Const.SILENCE_ON, false) && !isDoNotDisturbActive) {
                 // default: old state
-                Utils.log("set ringer mode to old state")
+                Timber.d("set ringer mode to old state")
                 val ringerMode = Utils.getSetting(this, Const.SILENCE_OLD_STATE, AudioManager.RINGER_MODE_NORMAL.toString())
                 audioManager.ringerMode = ringerMode.toInt()
                 Utils.setSetting(this, Const.SILENCE_ON, false)

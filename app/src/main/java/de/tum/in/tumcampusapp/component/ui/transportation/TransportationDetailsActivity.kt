@@ -17,6 +17,7 @@ import de.tum.`in`.tumcampusapp.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 
 /**
  * Activity to show transport departures for a specified station
@@ -88,7 +89,7 @@ class TransportationDetailsActivity : ProgressActivity<Unit>(R.layout.activity_t
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::displayResults) {
                     // something went wrong
-                    Utils.log(it)
+                    Timber.e(it)
                     showError(R.string.no_departures_found)
                 })
     }

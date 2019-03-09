@@ -13,6 +13,7 @@ import org.jetbrains.anko.doAsync
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import timber.log.Timber
 
 class CacheManager(private val context: Context) {
 
@@ -39,7 +40,7 @@ class CacheManager(private val context: Context) {
                     }
 
                     override fun onFailure(call: Call<EventsResponse>, t: Throwable) {
-                        Utils.log(t, "Error while loading calendar in CacheManager")
+                        Timber.e(t, "Error while loading calendar in CacheManager")
                     }
                 })
     }
@@ -57,14 +58,14 @@ class CacheManager(private val context: Context) {
                 .enqueue(object : Callback<LecturesResponse> {
                     override fun onResponse(call: Call<LecturesResponse>,
                                             response: Response<LecturesResponse>) {
-                        Utils.log("Successfully updated personal lectures in background")
+                        Timber.d("Successfully updated personal lectures in background")
                         val lectures = response.body()?.lectures ?: return
                         val chatRoomController = ChatRoomController(context)
                         chatRoomController.createLectureRooms(lectures)
                     }
 
                     override fun onFailure(call: Call<LecturesResponse>, t: Throwable) {
-                        Utils.log(t, "Error loading personal lectures in background")
+                        Timber.e(t, "Error loading personal lectures in background")
                     }
                 })
     }

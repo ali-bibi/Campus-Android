@@ -36,6 +36,7 @@ import de.tum.in.tumcampusapp.database.TcaDb;
 import de.tum.in.tumcampusapp.utils.Const;
 import de.tum.in.tumcampusapp.utils.Utils;
 import de.tum.in.tumcampusapp.utils.sync.SyncManager;
+import timber.log.Timber;
 
 /**
  * Calendar Manager, handles database stuff, external imports.
@@ -245,7 +246,7 @@ public class CalendarController implements ProvidesCard, ProvidesNotifications {
         try {
             replaceIntoDb(events);
         } catch (Exception e) {
-            Utils.log(e);
+            Timber.e(e);
         }
 
         new SyncManager(mContext).replaceIntoDb(Const.SYNC_CALENDAR_IMPORT);

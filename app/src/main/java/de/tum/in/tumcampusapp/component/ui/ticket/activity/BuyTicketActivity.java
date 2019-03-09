@@ -38,6 +38,7 @@ import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 /**
  * This activity shows an overview of the available tickets and a selection of all ticket types
@@ -80,7 +81,7 @@ public class BuyTicketActivity extends BaseActivity {
         Disposable disposable = ticketsRemoteRepo.fetchTicketTypesForEvent(eventId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(Utils::log)
+                .doOnError(Timber::e)
                 .subscribe(this::handleTicketTypesDownloadSuccess, throwable -> {
                     Utils.showToast(BuyTicketActivity.this, R.string.error_something_wrong);
                     finish();
@@ -207,7 +208,7 @@ public class BuyTicketActivity extends BaseActivity {
                     @Override
                     public void onFailure(@NonNull Call<TicketReservationResponse> call,
                                           @NonNull Throwable t) {
-                        Utils.log(t);
+                        Timber.e(t);
                         handleTicketReservationFailure(R.string.error_something_wrong);
                     }
                 });

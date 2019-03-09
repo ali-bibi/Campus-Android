@@ -5,6 +5,7 @@ import de.tum.`in`.tumcampusapp.api.app.TUMCabeClient
 import de.tum.`in`.tumcampusapp.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import javax.inject.Inject
 
 class KinoRemoteRepository @Inject constructor(
@@ -30,7 +31,7 @@ class KinoRemoteRepository @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .doAfterNext { localRepository.updateLastSync() }
                 .map { it.toTypedArray() }
-                .subscribe(localRepository::addKino, Utils::log)
+                .subscribe(localRepository::addKino, Timber::e)
     }
 
 }

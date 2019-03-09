@@ -63,6 +63,7 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
+import timber.log.Timber;
 
 /**
  * Proxy class for Retrofit client to our API hosted @app.tum.de
@@ -227,7 +228,7 @@ public final class TUMCabeClient {
         try {
             return service.verifyKey().execute().body();
         } catch (IOException e) {
-            Utils.log(e);
+            Timber.e(e);
             return null;
         }
     }
@@ -242,7 +243,7 @@ public final class TUMCabeClient {
         try {
             return service.getUploadStatus(lrzId).execute().body();
         } catch (IOException e) {
-            Utils.log(e);
+            Timber.e(e);
             return null;
         }
     }

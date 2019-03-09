@@ -22,10 +22,10 @@ import de.tum.in.tumcampusapp.component.ui.cafeteria.model.CafeteriaMenu;
 import de.tum.in.tumcampusapp.component.ui.cafeteria.model.CafeteriaResponse;
 import de.tum.in.tumcampusapp.database.TcaDb;
 import de.tum.in.tumcampusapp.utils.DateTimeUtils;
-import de.tum.in.tumcampusapp.utils.Utils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 /**
  * Cafeteria Menu Manager, handles database stuff, external imports
@@ -72,7 +72,7 @@ public class CafeteriaMenuManager {
 
                     @Override
                     public void onFailure(@NonNull Call<CafeteriaResponse> call, @NonNull Throwable t) {
-                        Utils.log(t);
+                        Timber.e(t);
                     }
                 });
     }

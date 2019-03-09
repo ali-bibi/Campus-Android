@@ -3,8 +3,6 @@ package de.tum.in.tumcampusapp.component.tumui.feedback;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +13,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.RecyclerView;
 import de.tum.in.tumcampusapp.R;
-import de.tum.in.tumcampusapp.utils.Utils;
+import timber.log.Timber;
 
 public class FeedbackThumbnailsAdapter extends RecyclerView.Adapter<FeedbackThumbnailsAdapter.ViewHolder> {
     private List<String> paths;
@@ -51,7 +51,7 @@ public class FeedbackThumbnailsAdapter extends RecyclerView.Adapter<FeedbackThum
             Bitmap bitmap = createThumb(holder.imageView, position);
 
             if (bitmap == null) {
-                Utils.log("Image removed from feedback (thumbnail couldn't be read)");
+                Timber.d("Image removed from feedback (thumbnail couldn't be read)");
                 new File(paths.get(position)).delete();
                 paths.remove(position);
                 thumbs.remove(position);

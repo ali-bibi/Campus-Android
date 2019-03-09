@@ -14,6 +14,7 @@ import de.tum.`in`.tumcampusapp.service.di.DownloadModule
 import de.tum.`in`.tumcampusapp.utils.CacheManager
 import de.tum.`in`.tumcampusapp.utils.NetUtils
 import de.tum.`in`.tumcampusapp.utils.Utils
+import timber.log.Timber
 import javax.inject.Inject
 
 class DownloadWorker(
@@ -25,7 +26,7 @@ class DownloadWorker(
     lateinit var downloadActions: DownloadWorker.WorkerActions
 
     init {
-        Utils.log("DownloadService service has started")
+        Timber.d("DownloadService service has started")
         injector.downloadComponent()
                 .downloadModule(DownloadModule())
                 .build()
@@ -38,7 +39,7 @@ class DownloadWorker(
             Utils.setSetting(applicationContext, LAST_UPDATE, System.currentTimeMillis())
             success()
         } catch (e: Exception) {
-            Utils.log(e)
+            Timber.e(e)
             retry()
         }
     }

@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import de.tum.`in`.tumcampusapp.api.app.TUMCabeClient
 import de.tum.`in`.tumcampusapp.component.ui.news.TopNewsStore
 import de.tum.`in`.tumcampusapp.component.ui.news.model.NewsAlert
-import de.tum.`in`.tumcampusapp.utils.Utils
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import javax.inject.Inject
 
 class TopNewsRemoteRepository @Inject constructor(
@@ -20,7 +20,7 @@ class TopNewsRemoteRepository @Inject constructor(
     fun fetchNewsAlert() {
         tumCabeClient.newsAlert
                 .subscribeOn(Schedulers.io())
-                .subscribe(this::onTopNewsDownloaded, Utils::log)
+                .subscribe(this::onTopNewsDownloaded, Timber::e)
     }
 
     private fun onTopNewsDownloaded(newsAlert: NewsAlert) {

@@ -21,6 +21,7 @@ import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.Utils
 import de.tum.`in`.tumcampusapp.utils.tryOrNull
 import org.jetbrains.anko.doAsync
+import timber.log.Timber
 import java.io.IOException
 import java.lang.Double.parseDouble
 import java.util.*
@@ -275,7 +276,7 @@ class LocationManager(c: Context) {
         val resultCode = GoogleApiAvailability.getInstance()
                 .isGooglePlayServicesAvailable(mContext) == ConnectionResult.SUCCESS
 
-        Utils.log("Google Play services is $resultCode")
+        Timber.d("Google Play services is $resultCode")
         return resultCode
     }
 
@@ -290,7 +291,7 @@ class LocationManager(c: Context) {
             val coordinate = TUMCabeClient.getInstance(mContext).fetchCoordinates(archId)
             convertRoomFinderCoordinateToGeo(coordinate)
         } catch (e: IOException) {
-            Utils.log(e)
+            Timber.e(e)
             null
         }
     }
@@ -318,7 +319,7 @@ class LocationManager(c: Context) {
             }
 
         } catch (e: Exception) {
-            Utils.log(e)
+            Timber.e(e)
         }
         return null
     }
@@ -455,7 +456,7 @@ class LocationManager(c: Context) {
 
                 convertUTMtoLL(northing, easting, zone)
             } catch (e: Exception) {
-                Utils.log(e)
+                Timber.e(e)
                 null
             }
         }

@@ -37,6 +37,7 @@ import de.tum.in.tumcampusapp.utils.Utils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 public class ShowTicketActivity extends BaseActivity {
 
@@ -120,12 +121,12 @@ public class ShowTicketActivity extends BaseActivity {
 
                         @Override
                         public void onFailure(@NonNull Call<Ticket> call, @NonNull Throwable t) {
-                            Utils.log(t);
+                            Timber.e(t);
                             handleTicketRefreshFailure();
                         }
                     });
         } catch (NoPrivateKey e) {
-            Utils.log(e);
+            Timber.e(e);
         }
     }
 
@@ -184,7 +185,7 @@ public class ShowTicketActivity extends BaseActivity {
             Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
             ticketQrCodeImageView.setImageBitmap(bitmap);
         } catch (WriterException e) {
-            Utils.log(e);
+            Timber.e(e);
             Utils.showToast(this, R.string.error_something_wrong);
             finish();
         }

@@ -6,6 +6,7 @@ import de.tum.`in`.tumcampusapp.R
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
+import timber.log.Timber
 import java.text.ParseException
 import java.util.*
 
@@ -122,7 +123,7 @@ object DateTimeUtils {
     fun parseIsoDate(datetime: String) = try {
         isoDateFormatter.parseDateTime(datetime)
     } catch (e: ParseException) {
-        Utils.log(e)
+        Timber.e(e)
         null
     }
 
@@ -135,7 +136,7 @@ object DateTimeUtils {
     fun parseIsoDateWithMillis(datetime: String) = try {
         isoDateWithMillisFormatter.parseDateTime(datetime)
     } catch (e: ParseException) {
-        Utils.log(e)
+        Timber.e(e)
         null
     }
 
@@ -159,7 +160,7 @@ object DateTimeUtils {
     fun getDate(str: String): DateTime = try {
         DateTime.parse(str, dateFormatter)
     } catch (e: RuntimeException) {
-        Utils.log(e)
+        Timber.e(e)
         DateTime()
     }
 
@@ -189,7 +190,7 @@ object DateTimeUtils {
     fun getDateTime(str: String): DateTime = try {
         DateTime.parse(str, dateTimeFormatter)
     } catch (e: RuntimeException) {
-        Utils.log(e)
+        Timber.e(e)
         DateTime()
     }
 }

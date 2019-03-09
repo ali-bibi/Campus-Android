@@ -42,6 +42,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
+import timber.log.Timber;
 
 /**
  * This activity presents the chat rooms of user's
@@ -150,7 +151,7 @@ public class ChatRoomsActivity extends ActivityForAccessingTumOnline<LecturesRes
                         .getMemberRooms(currentChatMember.getId(), verification);
                 manager.replaceIntoRooms(rooms);
             } catch (IOException e) {
-                Utils.log(e);
+                Timber.e(e);
 
                 if (e instanceof UnknownHostException) {
                     showErrorSnackbar(R.string.error_no_internet_connection);
@@ -274,7 +275,7 @@ public class ChatRoomsActivity extends ActivityForAccessingTumOnline<LecturesRes
      * Works asynchronously.
      */
     private void createOrJoinChatRoom(String name) {
-        Utils.logv("create or join chat room " + name);
+        Timber.d("create or join chat room %s", name);
         if (this.currentChatMember == null) {
             Utils.showToast(this, getString(R.string.chat_not_setup));
             return;
@@ -292,12 +293,12 @@ public class ChatRoomsActivity extends ActivityForAccessingTumOnline<LecturesRes
             @Override
             public void onResponse(@NonNull Call<ChatRoom> call, @NonNull Response<ChatRoom> response) {
                 if (!response.isSuccessful()) {
-                    Utils.logv("Error creating&joining chat room: " + response.message());
+                    Timber.w("Error creating & joining chat room: %s", response.message());
                     return;
                 }
 
                 // The POST request is successful: go to room. API should have auto joined it
-                Utils.logv("Success creating&joining chat room: " + response.body());
+                Timber.d("Success creating & joining chat room: %s", response.body());
                 currentChatRoom = response.body();
 
                 manager.join(currentChatRoom);
@@ -317,7 +318,7 @@ public class ChatRoomsActivity extends ActivityForAccessingTumOnline<LecturesRes
 
             @Override
             public void onFailure(@NonNull Call<ChatRoom> call, @NonNull Throwable t) {
-                Utils.log(t, "Failure creating/joining chat room - trying to GET it from the server");
+                Timber.e(t, "Failure creating/joining chat room - trying to GET it from the server");
                 Utils.showToastOnUIThread(ChatRoomsActivity.this, R.string.activate_key);
             }
         };

@@ -7,6 +7,7 @@ import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingEvent
 import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.Utils
+import timber.log.Timber
 
 /**
  * Receiver for Geofencing updates regarding munich.
@@ -17,10 +18,10 @@ import de.tum.`in`.tumcampusapp.utils.Utils
 class GeofencingUpdateReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        Utils.logwithTag(TAG, "Received event")
+        Timber.d("Received event")
         val geofencingEvent = GeofencingEvent.fromIntent(intent)
         if (geofencingEvent.hasError()) {
-            Utils.logwithTag(TAG, "Geofencing event contained errors.")
+            Timber.d("Geofencing event contained errors.")
             return
         }
 
@@ -30,13 +31,11 @@ class GeofencingUpdateReceiver : BroadcastReceiver() {
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
             Utils.setSetting(context, Const.BACKGROUND_MODE, true)
             StartSyncReceiver.startBackground(context)
-            Utils.logwithTag(TAG, "Geofencing detected user entering munich, " +
-                    "enabling Auto updates")
+            Timber.d("Geofencing detected user entering Munich, enabling auto updates")
         } else if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
             Utils.setSetting(context, Const.BACKGROUND_MODE, false)
             StartSyncReceiver.cancelBackground()
-            Utils.logwithTag(TAG, "Geofencing detected user leaving munich, " +
-                    "disabling Auto updates")
+            Timber.d("Geofencing detected user leaving munich, Munich, disabling auto updates")
         }
     }
 

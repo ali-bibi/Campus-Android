@@ -7,10 +7,10 @@ import de.tum.`in`.tumcampusapp.component.ui.ticket.model.Event
 import de.tum.`in`.tumcampusapp.component.ui.ticket.repository.EventsRemoteRepository
 import de.tum.`in`.tumcampusapp.component.ui.tufilm.model.Kino
 import de.tum.`in`.tumcampusapp.component.ui.tufilm.repository.KinoLocalRepository
-import de.tum.`in`.tumcampusapp.utils.Utils
 import de.tum.`in`.tumcampusapp.utils.plusAssign
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import javax.inject.Inject
 
 class KinoDetailsViewModel @Inject constructor(
@@ -32,7 +32,7 @@ class KinoDetailsViewModel @Inject constructor(
     fun fetchTicketCount(eventId: Int) {
         compositeDisposable += eventsRemoteRepository.fetchTicketStats(eventId)
                 .subscribeOn(Schedulers.io())
-                .doOnError(Utils::log)
+                .doOnError(Timber::e)
                 .subscribe(_ticketCount::postValue) {
                     _ticketCount.postValue(null)
                 }
@@ -41,13 +41,13 @@ class KinoDetailsViewModel @Inject constructor(
     fun fetchKinoByPosition(position: Int) {
         compositeDisposable += localRepository.getKinoByPosition(position)
                 .subscribeOn(Schedulers.io())
-                .subscribe(_kino::postValue)
+                .subscribe(_kino::postValue, Timber::e)
     }
 
     fun fetchEventByMovieId(movieId: String) {
         compositeDisposable += localRepository.getEventByMovieId(movieId)
                 .subscribeOn(Schedulers.io())
-                .subscribe(_event::postValue)
+                .subscribe(_event::postValue, Timber::e)
     }
 
     override fun onCleared() {

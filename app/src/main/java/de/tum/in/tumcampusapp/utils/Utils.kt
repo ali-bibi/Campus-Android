@@ -11,19 +11,16 @@ import android.graphics.Canvas
 import android.os.BatteryManager
 import android.os.Build
 import android.preference.PreferenceManager
-import androidx.core.content.ContextCompat
-import androidx.core.content.pm.PackageInfoCompat
 import android.text.Html
 import android.text.Spanned
-import android.util.Log
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.content.pm.PackageInfoCompat
 import com.google.gson.Gson
-import de.tum.`in`.tumcampusapp.BuildConfig
 import org.jetbrains.anko.defaultSharedPreferences
+import timber.log.Timber
 import java.io.IOException
 import java.io.InputStream
-import java.io.PrintWriter
-import java.io.StringWriter
 import java.util.regex.Pattern
 
 /**
@@ -158,102 +155,6 @@ object Utils {
     }
 
     /**
-     * Logs an exception and additional information
-     * Use this anywhere in the app when a fatal error occurred.
-     * If you can give a better description of what went wrong
-     * use [.log] instead.
-     *
-     * @param t the source of message and stack trace
-     */
-    @JvmStatic
-    fun log(t: Throwable) {
-        try {
-            StringWriter().use { sw ->
-                t.printStackTrace(PrintWriter(sw))
-                val s = Thread.currentThread()
-                        .stackTrace[3].className
-                        .replace(LOGGING_REGEX.toRegex(), "")
-                Log.e(s, "$t\n$sw")
-            }
-        } catch (ignore: IOException) {
-            // there is a time to stop logging errors
-        }
-    }
-
-    /**
-     * Logs an exception and additional information
-     * Use this anywhere in the app when a fatal error occurred.
-     * If you can't give an exact error description simply use
-     * [.log] instead.
-     *
-     * @param e       Exception (source for message and stack trace)
-     * @param message Additional information for exception message
-     */
-    @JvmStatic
-    fun log(e: Throwable, message: String) {
-        try {
-            StringWriter().use { sw ->
-                e.printStackTrace(PrintWriter(sw))
-                val s = Thread.currentThread()
-                        .stackTrace[3].className
-                        .replace(LOGGING_REGEX.toRegex(), "")
-                Log.e(s, "$e $message\n$sw")
-            }
-        } catch (e1: IOException) {
-            // there is a time to stop logging errors
-        }
-
-    }
-
-    /**
-     * Logs a message
-     * Use this to log the current app state.
-     *
-     * @param message Information or Debug message
-     */
-    @JvmStatic
-    fun log(message: String) {
-        if (!BuildConfig.DEBUG) {
-            return
-        }
-        val s = Thread.currentThread()
-                .stackTrace[3].className
-                .replace(LOGGING_REGEX.toRegex(), "")
-        Log.d(s, message)
-    }
-
-    /**
-     * Logs a message
-     * Use this to log additional information that is not important in most cases.
-     *
-     * @param message Information or Debug message
-     */
-    @JvmStatic
-    fun logv(message: String) {
-        if (!BuildConfig.DEBUG) {
-            return
-        }
-        val s = Thread.currentThread()
-                .stackTrace[3].className
-                .replace(LOGGING_REGEX.toRegex(), "")
-        Log.v(s, message)
-    }
-
-    /**
-     * Logs a message with specified tag
-     * Use this to log a particular work
-     *
-     * @param message Information or Debug message
-     */
-    @JvmStatic
-    fun logwithTag(tag: String, message: String) {
-        if (!BuildConfig.DEBUG) {
-            return
-        }
-        Log.v(tag, message)
-    }
-
-    /**
      * Returns a String[]-List from a CSV input stream
      *
      * @param fin CSV input stream
@@ -267,7 +168,7 @@ object Utils {
                     .map { splitCsvLine(it) }
                     .toList()
         } catch (e: IOException) {
-            log(e)
+            Timber.e(e)
             emptyList()
         }
     }

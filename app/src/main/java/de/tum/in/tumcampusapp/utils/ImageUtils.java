@@ -15,6 +15,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Locale;
 
+import timber.log.Timber;
+
 /**
  * Helper class to create image files and rescale Bitmaps.
  */
@@ -48,7 +50,7 @@ public final class ImageUtils {
             rescaleBitmap(context, src, destination);
             return destination.getAbsolutePath();
         } catch (IOException e) {
-            Utils.log(e);
+            Timber.e(e);
             return null;
         }
     }
@@ -67,16 +69,16 @@ public final class ImageUtils {
         try {
             Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), src);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            Utils.log("img before: " + bitmap.getWidth() + " x " + bitmap.getHeight());
+            Timber.d("img before: " + bitmap.getWidth() + " x " + bitmap.getHeight());
             bitmap = getResizedBitmap(bitmap, 1000);
-            Utils.log("img after: " + bitmap.getWidth() + " x " + bitmap.getHeight());
+            Timber.d("img after: " + bitmap.getWidth() + " x " + bitmap.getHeight());
             bitmap.compress(Bitmap.CompressFormat.JPEG, Const.FEEDBACK_IMG_COMPRESSION_QUALITY, out);
             FileOutputStream fileOut = new FileOutputStream(destination);
             fileOut.write(out.toByteArray());
             fileOut.close();
             out.close();
         } catch (IOException e) {
-            Utils.log(e);
+            Timber.e(e);
         }
     }
 

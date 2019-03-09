@@ -13,6 +13,7 @@ import de.tum.`in`.tumcampusapp.component.ui.chat.ChatPushNotification
 import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.Utils
 import org.jetbrains.anko.notificationManager
+import timber.log.Timber
 import java.io.IOException
 
 /**
@@ -26,7 +27,7 @@ class FcmReceiverService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage?) {
         val data = message?.data ?: return
-        Utils.log("Notification received: $data")
+        Timber.d("Notification received: $data")
 
         // Legacy messages need to be handled - maybe some data is missing?
         if (!data.containsKey(PAYLOAD) || !data.containsKey("type")) {
@@ -43,7 +44,7 @@ class FcmReceiverService : FirebaseMessagingService() {
             try {
                 it.sendConfirmation()
             } catch (e: IOException) {
-                Utils.log(e)
+                Timber.e(e)
             }
         }
     }
@@ -65,7 +66,7 @@ class FcmReceiverService : FirebaseMessagingService() {
                             .getInstance(this)
                             .confirm(notificationId)
                 } catch (e: IOException) {
-                    Utils.log(e)
+                    Timber.e(e)
                 }
                 null
             }
@@ -85,13 +86,13 @@ class FcmReceiverService : FirebaseMessagingService() {
                 postNotification(it)
             }
         } catch (e: Exception) {
-            Utils.log(e)
+            Timber.e(e)
         }
     }
 
     override fun onNewToken(token: String?) {
         super.onNewToken(token)
-        Utils.log("new FCM token received")
+        Timber.d("new FCM token received")
         Utils.setSetting(this, Const.FCM_INSTANCE_ID, FirebaseInstanceId.getInstance().id)
         Utils.setSetting(this, Const.FCM_TOKEN_ID, token ?: "")
     }

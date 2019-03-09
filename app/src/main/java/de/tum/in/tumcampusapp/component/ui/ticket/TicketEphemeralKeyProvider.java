@@ -1,20 +1,20 @@
 package de.tum.in.tumcampusapp.component.ui.ticket;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.annotation.Size;
 
 import com.stripe.android.EphemeralKeyProvider;
 import com.stripe.android.EphemeralKeyUpdateListener;
 
 import java.util.HashMap;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Size;
 import de.tum.in.tumcampusapp.api.app.TUMCabeClient;
 import de.tum.in.tumcampusapp.api.app.exception.NoPrivateKey;
-import de.tum.in.tumcampusapp.utils.Utils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 public class TicketEphemeralKeyProvider implements EphemeralKeyProvider {
 
@@ -47,11 +47,11 @@ public class TicketEphemeralKeyProvider implements EphemeralKeyProvider {
                 @Override
                 public void onFailure(@NonNull Call<HashMap<String, Object>> call,
                                       @NonNull Throwable t) {
-                    Utils.log(t);
+                    Timber.e(t);
                 }
             });
         } catch (NoPrivateKey e) {
-            Utils.log(e);
+            Timber.e(e);
         }
     }
 

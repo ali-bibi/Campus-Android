@@ -15,6 +15,7 @@ import de.tum.`in`.tumcampusapp.utils.tryOrNull
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import timber.log.Timber
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -61,7 +62,7 @@ object FcmTokenHandler {
                     // Let the server know of our new registration ID
                     sendTokenToBackend(context, token)
 
-                    Utils.log("FCM registration successful")
+                    Timber.d("FCM registration successful")
                 })
     }
 
@@ -74,7 +75,7 @@ object FcmTokenHandler {
     private fun sendTokenToBackend(context: Context, token: String?) {
         // Check if all parameters are present
         if (token == null || token.isEmpty()) {
-            Utils.logv("Parameter missing for sending reg id")
+            Timber.d("Parameter missing for sending reg id")
             return
         }
 
@@ -87,12 +88,12 @@ object FcmTokenHandler {
                 .deviceUploadGcmToken(uploadToken, object : Callback<TUMCabeStatus> {
                     override fun onResponse(call: Call<TUMCabeStatus>, response: Response<TUMCabeStatus>) {
                         if (!response.isSuccessful) {
-                            Utils.logv("Uploading FCM registration failed...")
+                            Timber.e("Uploading FCM registration failed...")
                             return
                         }
 
                         val body = response.body() ?: return
-                        Utils.logv("Success uploading FCM registration id: ${body.status}")
+                        Timber.d("Success uploading FCM registration id: ${body.status}")
 
                         // Store in shared preferences the information that the GCM registration id
                         // was sent to the TCA server successfully
@@ -100,7 +101,7 @@ object FcmTokenHandler {
                     }
 
                     override fun onFailure(call: Call<TUMCabeStatus>, t: Throwable) {
-                        Utils.log(t, "Failure uploading FCM registration id")
+                        Timber.e(t, "Failure uploading FCM registration id")
                         Utils.setSetting(context, FCM_REG_ID_SENT_TO_SERVER, false)
                     }
                 })

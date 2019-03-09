@@ -14,6 +14,7 @@ import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import org.joda.time.DateTime
+import timber.log.Timber
 import javax.inject.Inject
 
 class CafeteriaViewModel @Inject constructor(
@@ -59,7 +60,7 @@ class CafeteriaViewModel @Inject constructor(
                 .defaultIfEmpty(emptyList())
                 .doOnError { _error.postValue(true) }
                 .doOnNext { _error.postValue(it.isEmpty()) }
-                .subscribe(_cafeterias::postValue, Utils::log)
+                .subscribe(_cafeterias::postValue, Timber::e)
     }
 
     /**
@@ -69,7 +70,7 @@ class CafeteriaViewModel @Inject constructor(
         compositeDisposable += Flowable.fromCallable { localRepository.getAllMenuDates() }
                 .subscribeOn(Schedulers.io())
                 .defaultIfEmpty(emptyList())
-                .subscribe(_menuDates::postValue, Utils::log)
+                .subscribe(_menuDates::postValue, Timber::e)
     }
 
     fun fetchCafeteriaMenus(id: Int, date: DateTime) {

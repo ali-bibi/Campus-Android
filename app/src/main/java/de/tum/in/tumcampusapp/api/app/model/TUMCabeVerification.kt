@@ -3,7 +3,7 @@ package de.tum.`in`.tumcampusapp.api.app.model
 import android.content.Context
 import de.tum.`in`.tumcampusapp.api.app.AuthenticationManager
 import de.tum.`in`.tumcampusapp.api.app.exception.NoPrivateKey
-import de.tum.`in`.tumcampusapp.utils.Utils
+import timber.log.Timber
 import java.math.BigInteger
 import java.security.SecureRandom
 import java.util.*
@@ -26,7 +26,7 @@ data class TUMCabeVerification(
             val signature = try {
                 AuthenticationManager(context).sign(date + rand + deviceID)
             } catch (e: NoPrivateKey) {
-                Utils.log(e)
+                Timber.e(e)
                 return null
             }
 

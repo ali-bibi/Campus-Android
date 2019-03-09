@@ -25,6 +25,7 @@ import org.jetbrains.anko.connectivityManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import timber.log.Timber
 import java.net.UnknownHostException
 
 /**
@@ -165,7 +166,7 @@ abstract class ProgressActivity<T>(
      * @param throwable The error that has occurred
      */
     protected fun onDownloadFailure(throwable: Throwable) {
-        Utils.log(throwable)
+        Timber.e(throwable)
 
         if (hadSuccessfulRequest) {
             showErrorSnackbar(throwable)

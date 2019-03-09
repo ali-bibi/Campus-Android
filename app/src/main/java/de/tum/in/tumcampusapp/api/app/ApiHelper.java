@@ -21,12 +21,12 @@ import java.util.concurrent.TimeUnit;
 
 import de.tum.in.tumcampusapp.BuildConfig;
 import de.tum.in.tumcampusapp.utils.Utils;
-import kotlin.text.Charsets;
 import okhttp3.CertificatePinner;
 import okhttp3.CookieJar;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import timber.log.Timber;
 
 import static de.tum.in.tumcampusapp.utils.Const.API_HOSTNAME;
 import static de.tum.in.tumcampusapp.utils.Const.API_HOSTNAME_NEW;
@@ -81,7 +81,7 @@ public final class ApiHelper {
         builder.connectTimeout(ApiHelper.HTTP_TIMEOUT, TimeUnit.MILLISECONDS);
         builder.readTimeout(ApiHelper.HTTP_TIMEOUT, TimeUnit.MILLISECONDS);
 
-        builder.addNetworkInterceptor(new TumHttpLoggingInterceptor(message -> Utils.logwithTag(TAG, message)));
+        builder.addNetworkInterceptor(new TumHttpLoggingInterceptor(Timber::d));
 
         //Save it to the static handle and return
         client = builder.build();
@@ -94,14 +94,13 @@ public final class ApiHelper {
         userAgent.append(Utils.getAppVersion(c));
 
         return chain -> {
-            Utils.log("Fetching: " + chain.request()
-                                          .url()
-                                          .toString());
-            Request.Builder newRequest = chain.request()
-                                              .newBuilder()
-                                              .addHeader("X-DEVICE-ID", AuthenticationManager.getDeviceID(c))
-                                              .addHeader("User-Agent", userAgent.toString())
-                                              .addHeader("X-ANDROID-VERSION", Build.VERSION.RELEASE);
+            Timber.d("Fetching: %s", chain.request().url().toString());
+            Request.Builder newRequest = chain
+                    .request()
+                    .newBuilder()
+                    .addHeader("X-DEVICE-ID", AuthenticationManager.getDeviceID(c))
+                    .addHeader("User-Agent", userAgent.toString())
+                    .addHeader("X-ANDROID-VERSION", Build.VERSION.RELEASE);
             try {
                 newRequest.addHeader("X-APP-VERSION", c.getPackageManager()
                                                        .getPackageInfo(c.getPackageName(), 0).versionName);
@@ -139,7 +138,7 @@ public final class ApiHelper {
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
             return barcodeEncoder.createBitmap(bitMatrix);
         } catch (WriterException e) {
-            Utils.log(e);
+            Timber.e(e);
             return null;
         }
     }

@@ -6,11 +6,11 @@ import androidx.lifecycle.ViewModel
 import de.tum.`in`.tumcampusapp.R
 import de.tum.`in`.tumcampusapp.component.ui.tufilm.model.Kino
 import de.tum.`in`.tumcampusapp.component.ui.tufilm.repository.KinoLocalRepository
-import de.tum.`in`.tumcampusapp.utils.Utils
 import de.tum.`in`.tumcampusapp.utils.plusAssign
 import io.reactivex.Flowable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -36,7 +36,7 @@ class KinoViewModel @Inject constructor(
         compositeDisposable += localRepository.getAllKinos()
                 .subscribeOn(Schedulers.io())
                 .defaultIfEmpty(emptyList())
-                .doOnError(Utils::log)
+                .doOnError(Timber::e)
                 .subscribe(_kinos::postValue) {
                     _error.postValue(R.string.error_something_wrong)
                 }

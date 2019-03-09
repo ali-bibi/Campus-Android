@@ -7,10 +7,10 @@ import de.tum.`in`.tumcampusapp.component.ui.ticket.di.EventId
 import de.tum.`in`.tumcampusapp.component.ui.ticket.model.Event
 import de.tum.`in`.tumcampusapp.component.ui.ticket.repository.EventsRemoteRepository
 import de.tum.`in`.tumcampusapp.component.ui.ticket.repository.TicketsLocalRepository
-import de.tum.`in`.tumcampusapp.utils.Utils
 import de.tum.`in`.tumcampusapp.utils.plusAssign
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import javax.inject.Inject
 
 class EventDetailsViewModel @Inject constructor(
@@ -31,7 +31,7 @@ class EventDetailsViewModel @Inject constructor(
     fun fetchTicketCount() {
         compositeDisposable += eventsRemoteRepository.fetchTicketStats(eventId)
                 .subscribeOn(Schedulers.io())
-                .doOnError(Utils::log)
+                .doOnError(Timber::e)
                 .subscribe(_ticketCount::postValue) {
                     _ticketCount.postValue(null)
                 }

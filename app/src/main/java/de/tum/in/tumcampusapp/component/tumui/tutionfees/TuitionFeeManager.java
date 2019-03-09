@@ -1,7 +1,6 @@
 package de.tum.in.tumcampusapp.component.tumui.tutionfees;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import de.tum.in.tumcampusapp.api.tumonline.CacheControl;
 import de.tum.in.tumcampusapp.api.tumonline.TUMOnlineClient;
 import de.tum.in.tumcampusapp.component.notifications.NotificationScheduler;
@@ -22,6 +22,7 @@ import de.tum.in.tumcampusapp.component.ui.overview.card.Card;
 import de.tum.in.tumcampusapp.component.ui.overview.card.ProvidesCard;
 import de.tum.in.tumcampusapp.utils.Utils;
 import retrofit2.Response;
+import timber.log.Timber;
 
 /**
  * Tuition manager, handles tuition card
@@ -65,7 +66,7 @@ public class TuitionFeeManager implements ProvidesCard, ProvidesNotifications {
                     .getTuitionFeesStatus(cacheControl)
                     .execute();
 
-            if (response == null || !response.isSuccessful()) {
+            if (!response.isSuccessful()) {
                 return null;
             }
 
@@ -81,7 +82,7 @@ public class TuitionFeeManager implements ProvidesCard, ProvidesNotifications {
 
             return tuitionList.getTuitions().get(0);
         } catch (IOException e) {
-            Utils.log(e);
+            Timber.e(e);
             return null;
         }
     }

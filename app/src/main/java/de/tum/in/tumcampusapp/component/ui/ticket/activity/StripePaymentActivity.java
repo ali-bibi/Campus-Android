@@ -45,6 +45,7 @@ import de.tum.in.tumcampusapp.utils.Utils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 public class StripePaymentActivity extends BaseActivity {
 
@@ -180,12 +181,12 @@ public class StripePaymentActivity extends BaseActivity {
 
                                 @Override
                                 public void onFailure(@NonNull Call<Ticket> call, @NonNull Throwable t) {
-                                    Utils.log(t);
+                                    Timber.e(t);
                                     handleTicketPurchaseFailure();
                                 }
                             });
         } catch (NoPrivateKey e) {
-            Utils.log(e);
+            Timber.e(e);
             handleTicketPurchaseFailure();
         }
     }
@@ -312,7 +313,7 @@ public class StripePaymentActivity extends BaseActivity {
 
             @Override
             public void onError(int errorCode, @Nullable String errorMessage) {
-                Utils.log("Error: " + errorMessage);
+                Timber.d("Error: %s", errorMessage);
                 showError(getString(R.string.customersession_init_failed));
             }
 

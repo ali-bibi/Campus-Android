@@ -16,6 +16,7 @@ import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.Utils
 import de.tum.`in`.tumcampusapp.utils.sync.SyncManager
 import org.jetbrains.anko.doAsync
+import timber.log.Timber
 
 class QueryLocationsService : JobIntentService() {
 
@@ -55,7 +56,7 @@ class QueryLocationsService : JobIntentService() {
             CalendarController.syncCalendar(this)
             syncManager.replaceIntoDb(Const.SYNC_CALENDAR)
         } catch (e: SQLiteException) {
-            Utils.log(e)
+            Timber.e(e)
         }
     }
 
@@ -71,7 +72,7 @@ class QueryLocationsService : JobIntentService() {
         private const val TIME_TO_SYNC_CALENDAR = 604800 // 1 week
 
         @JvmStatic fun enqueueWork(context: Context) {
-            Utils.log("Query locations work enqueued")
+            Timber.d("Query locations work enqueued")
             JobIntentService.enqueueWork(context, QueryLocationsService::class.java,
                     Const.QUERY_LOCATIONS_SERVICE_JOB_ID, Intent())
         }

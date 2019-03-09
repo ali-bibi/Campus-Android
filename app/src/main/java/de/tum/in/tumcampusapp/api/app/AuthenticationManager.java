@@ -39,6 +39,7 @@ import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 /**
  * This provides methods to authenticate this app installation with the tumcabe server and other instances requiring a pki.
@@ -128,7 +129,7 @@ public class AuthenticationManager {
         try {
             return getKeyFactoryInstance().generatePrivate(new PKCS8EncodedKeySpec(privateKeyBytes));
         } catch (InvalidKeySpecException e) {
-            Utils.log(e);
+            Timber.e(e);
         }
         return null;
     }
@@ -214,7 +215,7 @@ public class AuthenticationManager {
 
                 @Override
                 public void onFailure(@NonNull Call<TUMCabeStatus> call, @NonNull Throwable t) {
-                    Utils.log(t, "Failure uploading public key");
+                    Timber.e(t, "Failure uploading public key");
                     Utils.setSetting(mContext, Const.PUBLIC_KEY_UPLOADED, false);
                 }
             });
@@ -241,14 +242,13 @@ public class AuthenticationManager {
                                            @NonNull Response<TokenConfirmation> response) {
                         TokenConfirmation confirmation = response.body();
                         if (confirmation != null && confirmation.isConfirmed()) {
-                            Utils.log("Uploaded public key successfully");
+                            Timber.d("Uploaded public key successfully");
                         }
                     }
 
                     @Override
                     public void onFailure(@NonNull Call<TokenConfirmation> call, @NonNull Throwable t) {
-                        Utils.log(t);
-                        // TODO: We should probably try again
+                        Timber.e(t);
                     }
                 });
     }
@@ -271,13 +271,13 @@ public class AuthenticationManager {
     public void uploadObfuscatedIds(UploadStatus uploadStatus) {
         String lrzId = Utils.getSetting(mContext, Const.LRZ_ID, "");
         if (lrzId.isEmpty()) {
-            Utils.log("Can't upload obfuscated ids: no lrz id");
+            Timber.d("Can't upload obfuscated ids: no lrz id");
             return;
         }
 
         TUMCabeVerification verification = TUMCabeVerification.create(mContext, null);
         if (verification == null) {
-            Utils.log("Can't upload obfuscated ids: no private key");
+            Timber.d("Can't upload obfuscated ids: no private key");
             return;
         }
 
@@ -301,14 +301,14 @@ public class AuthenticationManager {
         }
 
         if (doUpload) {
-            Utils.log("uploading obfuscated ids: " + upload.toString());
+            Timber.d("uploading obfuscated ids: %s", upload.toString());
             TUMCabeClient.getInstance(mContext)
                     .uploadObfuscatedIds(lrzId, upload)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(status -> {
-                        Utils.log("Upload obfuscated IDs status: " + status.getStatus());
-                    }, Utils::log);
+                        Timber.d("Upload obfuscated IDs status: %s", status.getStatus());
+                    }, Timber::e);
         }
     }
 

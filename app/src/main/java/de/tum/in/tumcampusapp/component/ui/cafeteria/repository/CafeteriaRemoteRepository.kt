@@ -2,9 +2,9 @@ package de.tum.`in`.tumcampusapp.component.ui.cafeteria.repository
 
 import android.annotation.SuppressLint
 import de.tum.`in`.tumcampusapp.api.app.TUMCabeClient
-import de.tum.`in`.tumcampusapp.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import javax.inject.Inject
 
 class CafeteriaRemoteRepository @Inject constructor(
@@ -30,7 +30,7 @@ class CafeteriaRemoteRepository @Inject constructor(
                 .flatMap { tumCabeClient.cafeterias }
                 .doAfterNext { localRepository.updateLastSync() }
                 .map { it.toTypedArray() }
-                .subscribe(localRepository::addCafeteria, Utils::log)
+                .subscribe(localRepository::addCafeteria, Timber::e)
     }
 
 }

@@ -10,8 +10,8 @@ import de.tum.in.tumcampusapp.R;
 import de.tum.in.tumcampusapp.api.app.TUMCabeClient;
 import de.tum.in.tumcampusapp.component.other.generic.activity.ActivityForLoadingInBackground;
 import de.tum.in.tumcampusapp.component.ui.barrierfree.model.BarrierfreeContact;
-import de.tum.in.tumcampusapp.utils.Utils;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
+import timber.log.Timber;
 
 public class BarrierFreeContactActivity extends ActivityForLoadingInBackground<Void, List<BarrierfreeContact>> {
 
@@ -36,7 +36,7 @@ public class BarrierFreeContactActivity extends ActivityForLoadingInBackground<V
             result = TUMCabeClient.getInstance(this)
                                   .getBarrierfreeContactList();
         } catch (IOException e) {
-            Utils.log(e);
+            Timber.e(e);
             return result;
         }
         return result;

@@ -58,6 +58,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
+import timber.log.Timber;
 
 /**
  * Activity showing the user's calendar. Calendar items (events) are fetched from TUMOnline and displayed as blocks on a timeline.
@@ -249,8 +250,8 @@ public class CalendarActivity extends ActivityForAccessingTumOnline<EventsRespon
                     if (!isFinishing()) {
                         displayCalendarSyncSuccessDialog();
                     }
-                }, throwable -> {
-                    Utils.log(throwable);
+                }, t -> {
+                    Timber.e(t);
                     Utils.showToast(this, R.string.export_to_google_error);
                 });
         mDisposable.add(disposable);
@@ -554,7 +555,7 @@ public class CalendarActivity extends ActivityForAccessingTumOnline<EventsRespon
 
     protected void initFilterCheckboxes() {
         boolean showCancelledEvents = Utils.getSettingBool(this, Const.CALENDAR_FILTER_CANCELED, true);
-        Utils.log(showCancelledEvents ? "Show cancelled events" : "Hide cancelled events");
+        Timber.d(showCancelledEvents ? "Show cancelled events" : "Hide cancelled events");
         menuItemFilterCanceled.setChecked(showCancelledEvents);
         applyFilterCanceled(showCancelledEvents);
     }

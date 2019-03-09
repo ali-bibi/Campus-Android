@@ -29,6 +29,7 @@ import de.tum.in.tumcampusapp.utils.Utils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 /**
  * Allows user to search for other users which he or she can then add to the ChatRoom
@@ -60,7 +61,7 @@ public class AddChatMemberActivity extends BaseActivity {
 
         room = new ChatRoom(getIntent().getStringExtra(Const.CHAT_ROOM_NAME));
         room.setId(getIntent().getIntExtra(Const.CURRENT_CHAT_ROOM, -1));
-        Utils.log("ChatRoom: " + room.getTitle() + " (roomId: " + room.getId() + ")");
+        Timber.d("ChatRoom: " + room.getTitle() + " (roomId: " + room.getId() + ")");
 
         tumCabeClient = TUMCabeClient.getInstance(this);
 
@@ -75,7 +76,7 @@ public class AddChatMemberActivity extends BaseActivity {
 
         searchView.setOnEditorActionListener((textView, actionId, keyEvent) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                Utils.log("Search");
+                Timber.d("Search");
                 delayHandler.removeCallbacks(suggestionRunnable);
                 getSuggestions();
 
@@ -155,7 +156,7 @@ public class AddChatMemberActivity extends BaseActivity {
     private void getSuggestions() {
         String input = searchView.getText()
                                  .toString();
-        Utils.log("Get suggestions for " + input);
+        Timber.d("Get suggestions for " + input);
         tumCabeClient.searchChatMember(input, new Callback<List<ChatMember>>() {
             @Override
             public void onResponse(@NonNull Call<List<ChatMember>> call,

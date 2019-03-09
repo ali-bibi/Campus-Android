@@ -5,18 +5,19 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.button.MaterialButton;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.google.android.material.button.MaterialButton;
+
 import java.util.Locale;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import de.tum.in.tumcampusapp.R;
 import de.tum.in.tumcampusapp.api.app.AuthenticationManager;
 import de.tum.in.tumcampusapp.api.app.exception.NoPublicKey;
@@ -34,6 +35,7 @@ import de.tum.in.tumcampusapp.utils.Utils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 /**
  * Displays the first page of the startup wizard, where the user can enter his lrz-id.
@@ -155,7 +157,7 @@ public class WizNavStartActivity extends ProgressActivity<Void> implements TextW
                     return;
                 }
 
-                Utils.log(t);
+                Timber.e(t);
                 showLoadingEnded();
                 resetAccessToken();
                 displayErrorDialog(t);
@@ -171,7 +173,7 @@ public class WizNavStartActivity extends ProgressActivity<Void> implements TextW
      * @param accessToken The downloaded {@link AccessToken}
      */
     private void handleTokenDownloadSuccess(AccessToken accessToken) {
-        Utils.log("AcquiredAccessToken = " + accessToken.getToken());
+        Timber.d("AcquiredAccessToken = %s", accessToken.getToken());
 
         // Save access token to preferences
         Utils.setSetting(this, Const.ACCESS_TOKEN, accessToken.getToken());
@@ -181,7 +183,7 @@ public class WizNavStartActivity extends ProgressActivity<Void> implements TextW
         try {
             am.uploadPublicKey();
         } catch (NoPublicKey noPublicKey) {
-            Utils.log(noPublicKey);
+            Timber.e(noPublicKey);
         }
 
         openNextWizardStep();

@@ -11,11 +11,11 @@ import de.tum.`in`.tumcampusapp.component.ui.chat.model.ChatRoom
 import de.tum.`in`.tumcampusapp.component.ui.chat.repository.ChatMessageLocalRepository
 import de.tum.`in`.tumcampusapp.component.ui.chat.repository.ChatMessageRemoteRepository
 import de.tum.`in`.tumcampusapp.utils.Const
-import de.tum.`in`.tumcampusapp.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 
 class ChatMessageViewModel(
         private val localRepository: ChatMessageLocalRepository,
@@ -72,7 +72,7 @@ class ChatMessageViewModel(
                     }
                     broadcastManager.sendBroadcast(intent)
                 }, { t ->
-                    Utils.logwithTag("ChatMessageViewModel", t.message ?: "unknown")
+                    Timber.e(t)
                     chatMessage.sendingStatus = ChatMessage.STATUS_ERROR
                     localRepository.replaceMessage(chatMessage)
                     val intent = Intent(Const.CHAT_BROADCAST_NAME)

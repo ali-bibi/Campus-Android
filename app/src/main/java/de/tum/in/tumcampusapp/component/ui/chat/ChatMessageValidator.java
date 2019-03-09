@@ -2,7 +2,6 @@ package de.tum.in.tumcampusapp.component.ui.chat;
 
 import android.util.Base64;
 
-
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.PublicKey;
@@ -17,8 +16,8 @@ import de.tum.in.tumcampusapp.api.app.AuthenticationManager;
 import de.tum.in.tumcampusapp.component.ui.chat.model.ChatMessage;
 import de.tum.in.tumcampusapp.component.ui.chat.model.ChatPublicKey;
 import de.tum.in.tumcampusapp.utils.RSASigner;
-import de.tum.in.tumcampusapp.utils.Utils;
 import kotlin.text.Charsets;
+import timber.log.Timber;
 
 /**
  * A class allowing a convenient API to check the validity of ChatMessages based
@@ -68,7 +67,7 @@ public class ChatMessageValidator {
         try {
             sig.initVerify(key);
         } catch (InvalidKeyException e) {
-            Utils.log(e);
+            Timber.e(e);
             return false;
         }
 
@@ -77,13 +76,13 @@ public class ChatMessageValidator {
         try {
             sig.update(textBytes);
         } catch (SignatureException e) {
-            Utils.log(e);
+            Timber.e(e);
             return false;
         }
         try {
             return sig.verify(decodeByteRepresentation(signature));
         } catch (SignatureException e) {
-            Utils.log(e);
+            Timber.e(e);
             return false;
         }
     }
@@ -107,7 +106,7 @@ public class ChatMessageValidator {
         try {
             return keyFactory.generatePublic(new X509EncodedKeySpec(keyBytes));
         } catch (InvalidKeySpecException e) {
-            Utils.log(e);
+            Timber.e(e);
             return null;
         }
 

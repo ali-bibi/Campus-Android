@@ -32,10 +32,10 @@ import de.tum.in.tumcampusapp.component.other.locations.LocationManager;
 import de.tum.in.tumcampusapp.component.tumui.feedback.model.Feedback;
 import de.tum.in.tumcampusapp.component.tumui.feedback.model.Success;
 import de.tum.in.tumcampusapp.utils.ImageUtils;
-import de.tum.in.tumcampusapp.utils.Utils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 /**
  * Handles choosing images and network operations and corresponding dialogs.
@@ -86,13 +86,13 @@ class FeedbackController {
             // Save a file: path for use with ACTION_VIEW intents
             mCurrentPhotoPath = photoFile.getAbsolutePath();
         } catch (IOException e) {
-            Utils.log(e);
+            Timber.e(e);
         }
         // Continue only if the File was successfully created
         if (photoFile == null) {
             return;
         }
-        Utils.log(mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath());
+        Timber.e(mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath());
         Uri photoURI = FileProvider.getUriForFile(mContext,
                 "de.tum.in.tumcampusapp.fileprovider",
                 photoFile);
@@ -122,7 +122,7 @@ class FeedbackController {
         }
         feedback.setImageCount(feedback.getPicturePaths().size());
 
-        Utils.log("Feedback: " + feedback.toString());
+        Timber.d("Feedback: %s", feedback.toString());
 
         imagesSent = 0;
         stopListeningForLocation();
@@ -170,7 +170,7 @@ class FeedbackController {
                 if (imagesSent == feedback.getImageCount()) {
                     onFeedbackSent(activity);
                 }
-                Utils.log("sent " + imagesSent + " of " + (feedback.getImageCount()) + " images");
+                Timber.d("sent " + imagesSent + " of " + (feedback.getImageCount()) + " images");
             }
 
             @Override
@@ -275,14 +275,14 @@ class FeedbackController {
     }
 
     void saveLocation() {
-        Utils.log("saveLocation");
+        Timber.d("saveLocation");
 
         locationManager = new LocationManager(mContext);
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location gps) {
                 location = gps; // just take the newest location
-                Utils.log("location (" + gps.getProvider() + "): " + location.getLatitude() + " " + location.getLongitude());
+                Timber.d("location (" + gps.getProvider() + "): " + location.getLatitude() + " " + location.getLongitude());
             }
 
             @Override
@@ -295,7 +295,7 @@ class FeedbackController {
 
             @Override
             public void onProviderDisabled(String s) {
-                Utils.log("Provider " + s + " disabled");
+                Timber.d("Provider %s disabled", s);
             }
         };
         locationManager.getLocationUpdates(locationListener);
@@ -305,7 +305,7 @@ class FeedbackController {
     }
 
     void stopListeningForLocation() {
-        Utils.log("Stop listening for location");
+        Timber.d("Stop listening for location");
         if (locationManager != null && locationListener != null) {
             locationManager.stopReceivingUpdates(locationListener);
         }

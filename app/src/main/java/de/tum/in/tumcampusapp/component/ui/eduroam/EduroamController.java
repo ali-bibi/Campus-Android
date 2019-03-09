@@ -12,7 +12,7 @@ import android.net.wifi.WifiManager;
 import java.util.List;
 
 import de.tum.in.tumcampusapp.utils.Const;
-import de.tum.in.tumcampusapp.utils.Utils;
+import timber.log.Timber;
 
 /**
  * Eduroam manager, manages connecting to eduroam wifi network
@@ -82,11 +82,11 @@ public class EduroamController {
         int networkId;
         if (update) {
             networkId = wifiManager.updateNetwork(conf);
-            Utils.log("deleted " + conf.networkId);
+            Timber.d("deleted %s", conf.networkId);
         } else {
             networkId = wifiManager.addNetwork(conf);
         }
-        Utils.log("added " + networkId);
+        Timber.d("added %s", networkId);
 
         //Check if update successful
         if (networkId == -1) {

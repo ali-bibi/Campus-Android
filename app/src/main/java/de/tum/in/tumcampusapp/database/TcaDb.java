@@ -61,9 +61,9 @@ import de.tum.in.tumcampusapp.database.migrations.Migration2to3;
 import de.tum.in.tumcampusapp.database.migrations.Migration3to4;
 import de.tum.in.tumcampusapp.utils.CacheManager;
 import de.tum.in.tumcampusapp.utils.Const;
-import de.tum.in.tumcampusapp.utils.Utils;
 import de.tum.in.tumcampusapp.utils.sync.SyncDao;
 import de.tum.in.tumcampusapp.utils.sync.model.Sync;
+import timber.log.Timber;
 
 @Database(version = 3, entities = {
         Cafeteria.class,
@@ -173,7 +173,7 @@ public abstract class TcaDb extends RoomDatabase {
         try {
             WorkManager.getInstance().cancelAllWork().wait();
         } catch (InterruptedException e) {
-            Utils.log(e);
+            Timber.e(e);
         }
 
         // Clear our cache table

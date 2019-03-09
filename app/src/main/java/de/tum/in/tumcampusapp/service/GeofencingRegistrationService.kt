@@ -16,8 +16,7 @@ import com.google.android.gms.location.LocationServices
 import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.Const.ADD_GEOFENCE_EXTRA
 import de.tum.`in`.tumcampusapp.utils.Const.GEOFENCING_SERVICE_JOB_ID
-import de.tum.`in`.tumcampusapp.utils.Utils
-
+import timber.log.Timber
 
 /**
  * Service that receives Geofencing requests and registers them.
@@ -34,7 +33,7 @@ class GeofencingRegistrationService : JobIntentService() {
     override fun onCreate() {
         super.onCreate()
         locationClient = LocationServices.getGeofencingClient(baseContext)
-        Utils.log("Service started")
+        Timber.d("Service started")
     }
 
     @SuppressLint("MissingPermission")
@@ -49,7 +48,7 @@ class GeofencingRegistrationService : JobIntentService() {
                 this, 0, geofenceIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         locationClient.addGeofences(request, geofencePendingIntent)
-        Utils.log("Registered new Geofence")
+        Timber.d("Registered new Geofence")
     }
 
     private fun isLocationPermissionGranted(): Boolean {

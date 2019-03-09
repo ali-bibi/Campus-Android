@@ -8,9 +8,8 @@ import android.widget.TextView
 import de.tum.`in`.tumcampusapp.R
 import de.tum.`in`.tumcampusapp.component.other.generic.activity.BaseActivity
 import de.tum.`in`.tumcampusapp.component.ui.alarm.model.FcmNotification
-
 import de.tum.`in`.tumcampusapp.utils.DateTimeUtils
-import de.tum.`in`.tumcampusapp.utils.Utils
+import timber.log.Timber
 
 /**
  * Activity to show any alarms
@@ -35,9 +34,7 @@ class AlarmActivity : BaseActivity(R.layout.activity_alarmdetails) {
 
     private fun processIntent(intent: Intent) {
         val notification = intent.getSerializableExtra("info") as FcmNotification
-        //FcmAlert alert = (FcmAlert) intent.getSerializableExtra("alert"); //Currently only has the silent flag, don't need it atm
-
-        Utils.log(notification.toString())
+        Timber.d(notification.toString())
 
         this.mTitle.text = notification.title
         this.mDescription.loadDataWithBaseURL(null, notification.description, "text/html", "utf-8", null)

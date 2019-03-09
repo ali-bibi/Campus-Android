@@ -23,6 +23,7 @@ import de.tum.`in`.tumcampusapp.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 
 class MVVWidgetConfigureActivity : ActivityForSearching<Unit>(
         R.layout.activity_mvv_widget_configure, MVVStationSuggestionProvider.AUTHORITY, 3) {
@@ -104,7 +105,7 @@ class MVVWidgetConfigureActivity : ActivityForSearching<Unit>(
                 .subscribe(this::displayStations) {
                     // Something went wrong
                     Utils.showToast(this, R.string.something_wrong)
-                    Utils.log(it)
+                    Timber.e(it)
                     onStartSearch()
                 })
     }

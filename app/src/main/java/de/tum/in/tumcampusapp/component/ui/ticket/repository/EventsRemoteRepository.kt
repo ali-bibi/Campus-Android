@@ -11,6 +11,7 @@ import de.tum.`in`.tumcampusapp.utils.Utils
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import javax.inject.Inject
 
 class EventsRemoteRepository @Inject constructor(
@@ -34,7 +35,7 @@ class EventsRemoteRepository @Inject constructor(
     private fun fetchAndStoreEvents() {
         fetchEvents()
                 .subscribeOn(Schedulers.io())
-                .subscribe(eventsLocalRepository::storeEvents, Utils::log)
+                .subscribe(eventsLocalRepository::storeEvents, Timber::e)
     }
 
     @SuppressLint("CheckResult")
@@ -43,9 +44,9 @@ class EventsRemoteRepository @Inject constructor(
             tumCabeClient.fetchTickets(context)
                     .subscribeOn(Schedulers.io())
                     .doOnNext { ticketsRemoteRepository.fetchTicketTypesForTickets(it) }
-                    .subscribe(ticketsLocalRepository::storeTickets, Utils::log)
+                    .subscribe(ticketsLocalRepository::storeTickets, Timber::e)
         } catch (e: NoPrivateKey) {
-            Utils.log(e)
+            Timber.e(e)
         }
     }
 

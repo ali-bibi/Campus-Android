@@ -22,6 +22,7 @@ import de.tum.`in`.tumcampusapp.component.ui.transportation.TransportController
 import de.tum.`in`.tumcampusapp.component.ui.updatenote.UpdateNoteCard
 import de.tum.`in`.tumcampusapp.utils.Utils
 import org.jetbrains.anko.doAsync
+import timber.log.Timber
 import javax.inject.Inject
 
 class CardsRepository @Inject constructor(
@@ -87,8 +88,7 @@ class CardsRepository @Inject constructor(
                 results.addAll(cards)
             } catch (e: Exception) {
                 // We still want to know about it though
-                Utils.log(e)
-                Crashlytics.logException(e)
+                Timber.e(e)
             }
         }
 

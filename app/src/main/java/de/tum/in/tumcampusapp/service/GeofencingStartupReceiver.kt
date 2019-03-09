@@ -5,8 +5,7 @@ import android.content.Context
 import android.content.Intent
 import de.tum.`in`.tumcampusapp.utils.Const.DISTANCE_IN_METER
 import de.tum.`in`.tumcampusapp.utils.Const.MUNICH_GEOFENCE
-import de.tum.`in`.tumcampusapp.utils.Utils
-
+import timber.log.Timber
 
 class GeofencingStartupReceiver : BroadcastReceiver() {
 
@@ -15,7 +14,7 @@ class GeofencingStartupReceiver : BroadcastReceiver() {
             return
         }
 
-        Utils.log("Restarting geofencing due to " + intent?.action)
+        Timber.d("Restarting geofencing due to ${intent?.action}")
         context?.let {
             val geofencingIntent = GeofencingRegistrationService.buildGeofence(it, MUNICH_GEOFENCE,
                     48.137430, 11.575490, DISTANCE_IN_METER)

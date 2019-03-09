@@ -15,8 +15,8 @@ import de.tum.`in`.tumcampusapp.component.other.generic.adapter.NoResultsAdapter
 import de.tum.`in`.tumcampusapp.component.tumui.roomfinder.model.RoomFinderRoom
 import de.tum.`in`.tumcampusapp.database.TcaDb
 import de.tum.`in`.tumcampusapp.utils.NetUtils
-import de.tum.`in`.tumcampusapp.utils.Utils
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView
+import timber.log.Timber
 import java.io.IOException
 import java.io.Serializable
 import java.util.regex.Pattern
@@ -70,7 +70,7 @@ class RoomFinderActivity : ActivityForSearchingInBackground<List<RoomFinderRoom>
         return try {
             TUMCabeClient.getInstance(this).fetchRooms(userRoomSearchMatching(query))
         } catch (e: IOException) {
-            Utils.log(e)
+            Timber.e(e)
             null
         }
     }

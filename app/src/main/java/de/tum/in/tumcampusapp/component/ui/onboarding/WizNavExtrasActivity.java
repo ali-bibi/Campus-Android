@@ -27,6 +27,7 @@ import de.tum.in.tumcampusapp.service.SilenceService;
 import de.tum.in.tumcampusapp.utils.Const;
 import de.tum.in.tumcampusapp.utils.NetUtils;
 import de.tum.in.tumcampusapp.utils.Utils;
+import timber.log.Timber;
 
 public class WizNavExtrasActivity extends ActivityForLoadingInBackground<Void, ChatMember> {
 
@@ -111,7 +112,7 @@ public class WizNavExtrasActivity extends ActivityForLoadingInBackground<Void, C
             // After the user has entered their display name, send a request to the server to create the new member
             member = tumCabeClient.createMember(currentChatMember);
         } catch (IOException e) {
-            Utils.log(e);
+            Timber.e(e);
             Utils.showToastOnUIThread(this, R.string.error_setup_chat_member);
             return null;
         }
@@ -143,7 +144,7 @@ public class WizNavExtrasActivity extends ActivityForLoadingInBackground<Void, C
 
             return member;
         } catch (IOException e) {
-            Utils.log(e);
+            Timber.e(e);
         }
 
         return null;

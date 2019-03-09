@@ -5,6 +5,7 @@ import de.tum.`in`.tumcampusapp.BuildConfig
 import de.tum.`in`.tumcampusapp.api.app.TUMCabeClient
 import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.Utils
+import timber.log.Timber
 import java.io.IOException
 
 class UpdateNoteController(context: Context) {
@@ -16,7 +17,7 @@ class UpdateNoteController(context: Context) {
                     .getUpdateNote(BuildConfig.VERSION_CODE)
             Utils.setSetting(mContext, Const.UPDATE_MESSAGE, note?.updateNote ?: "")
         } catch (e: IOException) {
-            Utils.log(e)
+            Timber.e(e)
         }
     }
 }

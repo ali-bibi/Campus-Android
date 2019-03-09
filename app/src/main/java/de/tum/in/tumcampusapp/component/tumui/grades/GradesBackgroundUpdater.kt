@@ -9,6 +9,7 @@ import de.tum.`in`.tumcampusapp.utils.Utils
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import timber.log.Timber
 import javax.inject.Inject
 
 class GradesBackgroundUpdater @Inject constructor(
@@ -46,7 +47,7 @@ class GradesBackgroundUpdater @Inject constructor(
     }
 
     override fun onFailure(call: Call<ExamList>, t: Throwable) {
-        Utils.log(t)
+        Timber.e(t)
     }
 
     companion object {

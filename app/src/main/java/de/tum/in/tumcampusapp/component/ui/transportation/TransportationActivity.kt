@@ -17,6 +17,7 @@ import de.tum.`in`.tumcampusapp.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import java.net.UnknownHostException
 
 /**
@@ -93,7 +94,7 @@ class TransportationActivity : ActivityForSearching<Unit>(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::displayStations) { t ->
                     // Something went wrong
-                    Utils.log(t)
+                    Timber.e(t)
                     when (t) {
                         is UnknownHostException -> showNoInternetLayout()
                         else -> showError(R.string.something_wrong)

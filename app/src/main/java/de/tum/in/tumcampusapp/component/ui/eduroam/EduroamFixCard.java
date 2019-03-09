@@ -6,8 +6,6 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiEnterpriseConfig;
 import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import de.tum.in.tumcampusapp.R;
 import de.tum.in.tumcampusapp.component.ui.overview.CardManager;
 import de.tum.in.tumcampusapp.component.ui.overview.card.Card;
 import de.tum.in.tumcampusapp.component.ui.overview.card.CardViewHolder;
 import de.tum.in.tumcampusapp.utils.Const;
-import de.tum.in.tumcampusapp.utils.Utils;
+import timber.log.Timber;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.M;
@@ -88,7 +88,7 @@ public class EduroamFixCard extends Card {
 
         // Eduroam was configured by other university
         if (!isTumEduroam(eduroam.enterpriseConfig.getIdentity())) {
-            Utils.log("Eduroam wasn't configured at TUM");
+            Timber.d("Eduroam wasn't configured at TUM");
             return true;
         }
 
@@ -147,7 +147,7 @@ public class EduroamFixCard extends Card {
 
     @SuppressWarnings("deprecation") // AltSubjectMatch is not available for API18
     private boolean isValidSubjectMatchAPI18(WifiConfiguration eduroam) {
-        Utils.log("SubjectMatch: " + eduroam.enterpriseConfig.getSubjectMatch());
+        Timber.d("SubjectMatch: %s", eduroam.enterpriseConfig.getSubjectMatch());
         return eduroam.enterpriseConfig.getSubjectMatch().equals(RADIUS_DNS);
     }
 }

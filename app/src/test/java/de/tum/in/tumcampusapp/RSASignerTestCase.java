@@ -18,7 +18,7 @@ import java.util.List;
 import de.tum.in.tumcampusapp.api.app.AuthenticationManager;
 import de.tum.in.tumcampusapp.component.ui.chat.model.ChatMessage;
 import de.tum.in.tumcampusapp.utils.RSASigner;
-import de.tum.in.tumcampusapp.utils.Utils;
+import timber.log.Timber;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,7 +38,7 @@ public class RSASignerTestCase {
             PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
             return keyFactory.generatePrivate(privateKeySpec);
         } catch (InvalidKeySpecException e) {
-            Utils.log(e);
+            Timber.e(e);
         }
         return null;
     }

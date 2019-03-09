@@ -22,6 +22,7 @@ import de.tum.in.tumcampusapp.component.ui.overview.card.Card;
 import de.tum.in.tumcampusapp.component.ui.overview.card.ProvidesCard;
 import de.tum.in.tumcampusapp.database.TcaDb;
 import de.tum.in.tumcampusapp.utils.Utils;
+import timber.log.Timber;
 
 /**
  * Cafeteria Manager, handles database stuff, external imports
@@ -86,7 +87,7 @@ public class CafeteriaManager implements ProvidesCard, ProvidesNotifications {
         // Choose which mensa should be shown
         int cafeteriaId = new LocationManager(mContext).getCafeteria();
         if (cafeteriaId == -1) {
-            Utils.log("could not get a Cafeteria from locationManager!");
+            Timber.d("could not get a Cafeteria from LocationManager");
         }
         return cafeteriaId;
     }

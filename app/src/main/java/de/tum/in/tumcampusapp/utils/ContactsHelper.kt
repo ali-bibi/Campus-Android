@@ -9,6 +9,7 @@ import android.provider.ContactsContract
 import de.tum.`in`.tumcampusapp.R
 import de.tum.`in`.tumcampusapp.component.tumui.person.model.Contact
 import de.tum.`in`.tumcampusapp.component.tumui.person.model.Employee
+import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.*
@@ -130,7 +131,7 @@ class ContactsHelper {
                 try {
                     stream.flush()
                 } catch (e: IOException) {
-                    Utils.log(e)
+                    Timber.e(e)
                 }
             }
 
@@ -139,9 +140,9 @@ class ContactsHelper {
                 context.contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
                 Utils.showToast(context, R.string.contact_added)
             } catch (e: RemoteException) {
-                Utils.log(e)
+                Timber.e(e)
             } catch (e: OperationApplicationException) {
-                Utils.log(e)
+                Timber.e(e)
             }
         }
 

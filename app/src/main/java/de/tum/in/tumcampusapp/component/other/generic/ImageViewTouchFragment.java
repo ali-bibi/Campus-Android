@@ -3,9 +3,6 @@ package de.tum.in.tumcampusapp.component.other.generic;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +11,11 @@ import android.widget.ImageView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import de.tum.in.tumcampusapp.R;
-import de.tum.in.tumcampusapp.utils.Utils;
+import timber.log.Timber;
 
 public class ImageViewTouchFragment extends Fragment {
 
@@ -33,7 +33,7 @@ public class ImageViewTouchFragment extends Fragment {
 
     public void loadImage(String url, ImageLoadingListener listener) {
         ImageView imageView = mRootView.findViewById(R.id.image_view_touch_fragment);
-        Utils.log("room finder url: " + url);
+        Timber.d("room finder url: " + url);
 
         Drawable icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_outline_map_24px);
         if (icon != null) {

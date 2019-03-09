@@ -13,7 +13,7 @@ import java.util.List;
 import de.tum.in.tumcampusapp.R;
 import de.tum.in.tumcampusapp.component.tumui.calendar.CalendarController;
 import de.tum.in.tumcampusapp.component.tumui.calendar.model.CalendarItem;
-import de.tum.in.tumcampusapp.utils.Utils;
+import timber.log.Timber;
 
 public class LectureListSelectionAdapter extends BaseAdapter implements CompoundButton.OnCheckedChangeListener {
     private final int appWidgetId;
@@ -31,8 +31,7 @@ public class LectureListSelectionAdapter extends BaseAdapter implements Compound
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         // save new preferences
-        Utils.logv("Widget asked to change " + buttonView.getText()
-                                                         .toString() + " to " + isChecked);
+        Timber.d("Widget asked to change " + buttonView.getText().toString() + " to " + isChecked);
         if (isChecked) {
             calendarController.deleteLectureFromBlacklist(this.appWidgetId, (String) buttonView.getText());
         } else {

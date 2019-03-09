@@ -21,6 +21,7 @@ import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.RSASigner
 import de.tum.`in`.tumcampusapp.utils.Utils
 import de.tum.`in`.tumcampusapp.utils.tryOrNull
+import timber.log.Timber
 import java.security.InvalidKeyException
 import java.security.PublicKey
 import java.security.SignatureException
@@ -54,7 +55,7 @@ class AlarmPushNotification(payload: String, context: Context, notification: Int
             info = notificationFromServer ?: return null
 
             if (!isValidSignature(info.title, info.description, info.signature)) {
-                Utils.log("Received an invalid RSA signature")
+                Timber.d("Received an invalid RSA signature")
                 return null
             }
 
@@ -104,7 +105,7 @@ class AlarmPushNotification(payload: String, context: Context, notification: Int
             try {
                 sig.initVerify(key)
             } catch (e: InvalidKeyException) {
-                Utils.log(e)
+                Timber.e(e)
                 return false
             }
 
@@ -112,17 +113,17 @@ class AlarmPushNotification(payload: String, context: Context, notification: Int
             try {
                 sig.update(textBytes)
             } catch (e: SignatureException) {
-                Utils.log(e)
+                Timber.e(e)
                 return false
             }
 
             return try {
                 sig.verify(Base64.decode(signature, Base64.DEFAULT))
             } catch (e: SignatureException) {
-                Utils.log(e)
+                Timber.e(e)
                 false
             } catch (e: IllegalArgumentException) {
-                Utils.log(e)
+                Timber.e(e)
                 false
             }
         }

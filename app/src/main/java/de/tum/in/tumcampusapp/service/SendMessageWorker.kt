@@ -11,7 +11,7 @@ import de.tum.`in`.tumcampusapp.component.ui.chat.ChatMessageViewModel
 import de.tum.`in`.tumcampusapp.component.ui.chat.repository.ChatMessageLocalRepository
 import de.tum.`in`.tumcampusapp.component.ui.chat.repository.ChatMessageRemoteRepository
 import de.tum.`in`.tumcampusapp.database.TcaDb
-import de.tum.`in`.tumcampusapp.utils.Utils
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 /**
@@ -41,7 +41,7 @@ class SendMessageWorker(context: Context, workerParams: WorkerParameters) :
             // Retrying doesn't make any sense
             failure()
         } catch (e: Exception) {
-            Utils.log(e)
+            Timber.e(e)
             // Maybe the server is currently busy, but we really want to send the messages
             retry()
         }

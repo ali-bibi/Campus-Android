@@ -27,6 +27,7 @@ import de.tum.in.tumcampusapp.database.TcaDb;
 import de.tum.in.tumcampusapp.utils.Const;
 import de.tum.in.tumcampusapp.utils.Utils;
 import retrofit2.Response;
+import timber.log.Timber;
 
 /**
  * TUMOnline cache manager, allows caching of TUMOnline requests
@@ -85,12 +86,12 @@ public class ChatRoomController implements ProvidesCard {
      */
     public void replaceIntoRooms(Collection<ChatRoom> rooms) {
         if (rooms == null || rooms.isEmpty()) {
-            Utils.log("No rooms passed, can't insert anything.");
+            Timber.d("No rooms passed, can't insert anything.");
             return;
         }
 
         chatRoomDao.markAsNotJoined();
-        Utils.log("reset join status of all rooms");
+        Timber.d("reset join status of all rooms");
 
         for (ChatRoom room : rooms) {
             String roomName = room.getTitle();
@@ -127,13 +128,11 @@ public class ChatRoomController implements ProvidesCard {
                     .getPersonalLectures(cacheControl)
                     .execute();
 
-            if (response != null) {
-                LecturesResponse lecturesResponse = response.body();
+            LecturesResponse lecturesResponse = response.body();
 
-                if (lecturesResponse != null) {
-                    List<Lecture> lectures = lecturesResponse.getLectures();
-                    createLectureRooms(lectures);
-                }
+            if (lecturesResponse != null) {
+                List<Lecture> lectures = lecturesResponse.getLectures();
+                createLectureRooms(lectures);
             }
 
             // Join all new chat rooms
@@ -155,7 +154,7 @@ public class ChatRoomController implements ProvidesCard {
                             this.join(currentChatRoom);
                         }
                     } catch (IOException e) {
-                        Utils.log(e, " - error occured while creating the room!");
+                        Timber.e(e, " - error occured while creating the room!");
                     }
                 }
             }
@@ -171,7 +170,7 @@ public class ChatRoomController implements ProvidesCard {
 
             return results;
         } catch (IOException e) {
-            Utils.log(e);
+            Timber.e(e);
             return results;
         }
     }

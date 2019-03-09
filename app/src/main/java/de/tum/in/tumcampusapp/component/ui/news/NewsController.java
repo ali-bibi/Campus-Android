@@ -26,6 +26,7 @@ import de.tum.in.tumcampusapp.component.ui.tufilm.FilmCard;
 import de.tum.in.tumcampusapp.database.TcaDb;
 import de.tum.in.tumcampusapp.utils.Utils;
 import de.tum.in.tumcampusapp.utils.sync.SyncManager;
+import timber.log.Timber;
 
 import static de.tum.in.tumcampusapp.api.tumonline.CacheControl.USE_CACHE;
 
@@ -77,7 +78,7 @@ public class NewsController implements ProvidesCard, ProvidesNotifications {
             List<NewsSources> sources = api.getNewsSources();
             newsSourcesDao.insert(sources);
         } catch (IOException e) {
-            Utils.log(e);
+            Timber.e(e);
             return;
         }
 
@@ -87,7 +88,7 @@ public class NewsController implements ProvidesCard, ProvidesNotifications {
             newsDao.insert(news);
             showNewsNotification(news, latestNewsDate);
         } catch (IOException e) {
-            Utils.log(e);
+            Timber.e(e);
             return;
         }
 
