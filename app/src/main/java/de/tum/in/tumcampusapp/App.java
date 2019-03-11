@@ -39,13 +39,10 @@ public class App extends Application {
     }
 
     protected void setupPicasso() {
-        Picasso.Builder builder = new Picasso.Builder(this);
-        builder.downloader(new OkHttp3Downloader(this, Integer.MAX_VALUE));
-
-        Picasso built = builder.build();
-        built.setLoggingEnabled(true);
-
-        Picasso.setSingletonInstance(built);
+        Picasso instance = new Picasso.Builder(this)
+                .downloader(new OkHttp3Downloader(this, Integer.MAX_VALUE))
+                .build();
+        Picasso.setSingletonInstance(instance);
     }
 
     protected void setupStrictMode() {

@@ -26,6 +26,7 @@ import okhttp3.CookieJar;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.logging.HttpLoggingInterceptor;
 import timber.log.Timber;
 
 import static de.tum.in.tumcampusapp.utils.Const.API_HOSTNAME;
@@ -81,7 +82,9 @@ public final class ApiHelper {
         builder.connectTimeout(ApiHelper.HTTP_TIMEOUT, TimeUnit.MILLISECONDS);
         builder.readTimeout(ApiHelper.HTTP_TIMEOUT, TimeUnit.MILLISECONDS);
 
-        builder.addNetworkInterceptor(new TumHttpLoggingInterceptor(Timber::d));
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(Timber::d);
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+        builder.addNetworkInterceptor(loggingInterceptor);
 
         //Save it to the static handle and return
         client = builder.build();
