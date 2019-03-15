@@ -19,6 +19,7 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.preference.CheckBoxPreference;
@@ -28,6 +29,7 @@ import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.SwitchPreferenceCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import de.tum.in.tumcampusapp.R;
 import de.tum.in.tumcampusapp.api.tumonline.AccessTokenManager;
 import de.tum.in.tumcampusapp.component.tumui.calendar.CalendarController;
@@ -44,11 +46,24 @@ import de.tum.in.tumcampusapp.utils.Utils;
 public class SettingsFragment extends PreferenceFragmentCompat
         implements SharedPreferences.OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener {
 
-    public static final String FRAGMENT_TAG = "my_preference_fragment";
     private static final String BUTTON_LOGOUT = "button_logout";
     private static final String SETUP_EDUROAM = "card_eduroam_setup";
 
     private FragmentActivity mContext;
+
+    public static SettingsFragment newInstance(Bundle args) {
+        SettingsFragment fragment = new SettingsFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static SettingsFragment newInstance(String root) {
+        SettingsFragment fragment = new SettingsFragment();
+        Bundle args = new Bundle();
+        args.putString(PreferenceFragmentCompat.ARG_PREFERENCE_ROOT, root);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onCreatePreferences(Bundle bundle, String rootKey) {
@@ -96,6 +111,15 @@ public class SettingsFragment extends PreferenceFragmentCompat
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        getListView().setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                boolean canScrollUp = recyclerView.canScrollVertically(Const.SCROLL_DIRECTION_UP);
+                AppCompatActivity activity = (AppCompatActivity) requireActivity();
+                activity.findViewById(R.id.toolbar).setSelected(canScrollUp);
+            }
+        });
 
         // Set the default white background in the view so as to avoid transparency
         view.setBackgroundColor(Color.WHITE);

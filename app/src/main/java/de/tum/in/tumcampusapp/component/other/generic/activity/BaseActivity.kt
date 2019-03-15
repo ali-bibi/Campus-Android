@@ -40,7 +40,7 @@ abstract class BaseActivity(private val layoutId: Int) : AppCompatActivity(),
 
     val injector: AppComponent by lazy { app.appComponent }
 
-    private val toolbar: Toolbar by lazy { findViewById<Toolbar>(R.id.main_toolbar) }
+    private val toolbar: Toolbar by lazy { findViewById<Toolbar>(R.id.toolbar) }
 
     private val drawerLayout: DrawerLayout? by lazy {
         findViewById<DrawerLayout>(R.id.drawer_layout)

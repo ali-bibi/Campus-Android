@@ -163,4 +163,6 @@ object Const {
     const val SHOW_UPDATE_NOTE = "showUpdateNote"
     const val UPDATE_MESSAGE = "updateNoteMessage"
     const val SAVED_APP_VERSION = "savedAppVersion"
+
+    const val SCROLL_DIRECTION_UP = -1
 }

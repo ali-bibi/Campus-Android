@@ -24,7 +24,7 @@ import kotlinx.android.synthetic.main.activity_study_rooms.*
  */
 class StudyRoomsActivity : ActivityForAccessingTumCabe<List<StudyRoomGroup>>(
         R.layout.activity_study_rooms
-), AdapterView.OnItemSelectedListener {
+), AdapterView.OnItemSelectedListener, StudyRoomGroupDetailsFragment.ScrollListener {
     private var groups: List<StudyRoomGroup> = emptyList()
     private var groupId = -1
 
@@ -58,6 +58,10 @@ class StudyRoomsActivity : ActivityForAccessingTumCabe<List<StudyRoomGroup>>(
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         loadStudyRooms()
+    }
+
+    override fun onScrolled(canScrollUp: Boolean) {
+        spinnerContainer.isSelected = canScrollUp
     }
 
     override fun onRefresh() = loadStudyRooms()

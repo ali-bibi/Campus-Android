@@ -10,20 +10,19 @@ import androidx.recyclerview.widget.RecyclerView
 import de.tum.`in`.tumcampusapp.R
 import de.tum.`in`.tumcampusapp.component.other.generic.adapter.GridEqualSpacingDecoration
 import de.tum.`in`.tumcampusapp.utils.Const
+import de.tum.`in`.tumcampusapp.utils.onScrolled
 
 /**
  * Fragment for each study room group. Shows study room details in a list.
  */
 class StudyRoomGroupDetailsFragment : Fragment() {
-    private var groupId: Int = 0
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.run {
-            if (containsKey(Const.STUDY_ROOM_GROUP_ID)) {
-                groupId = getInt(Const.STUDY_ROOM_GROUP_ID)
-            }
-        }
+    private val groupId: Int by lazy {
+        arguments?.getInt(Const.STUDY_ROOM_GROUP_ID) ?: throw IllegalStateException()
+    }
+
+    private val scrollListener: ScrollListener by lazy {
+        requireContext() as? ScrollListener ?: throw IllegalStateException()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -42,7 +41,29 @@ class StudyRoomGroupDetailsFragment : Fragment() {
 
             val spacing = Math.round(resources.getDimension(R.dimen.material_card_view_padding))
             addItemDecoration(GridEqualSpacingDecoration(spacing, spanCount))
+
+            onScrolled {
+                val canScrollUp = it.canScrollVertically(Const.SCROLL_DIRECTION_UP)
+                scrollListener.onScrolled(canScrollUp)
+            }
         }
         return rootView
     }
+
+    interface ScrollListener {
+        fun onScrolled(canScrollUp: Boolean)
+    }
+
+    companion object {
+
+        fun newInstance(groupId: Int): StudyRoomGroupDetailsFragment {
+            return StudyRoomGroupDetailsFragment().apply {
+                arguments = Bundle().apply {
+                    putInt(Const.STUDY_ROOM_GROUP_ID, groupId)
+                }
+            }
+        }
+
+    }
+
 }

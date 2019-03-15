@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.lifecycle.ViewModelProviders;
@@ -87,6 +88,16 @@ public class MainActivity extends BaseActivity
         mCardsView = findViewById(R.id.cards_view);
         registerForContextMenu(mCardsView);
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        mCardsView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                boolean canScrollUp = recyclerView.canScrollVertically(Const.SCROLL_DIRECTION_UP);
+                toolbar.setSelected(canScrollUp);
+            }
+        });
+
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(RecyclerView.VERTICAL);
         mCardsView.setLayoutManager(layoutManager);
@@ -95,10 +106,8 @@ public class MainActivity extends BaseActivity
         mAdapter = new CardAdapter();
         mCardsView.setAdapter(mAdapter);
 
-        showToolbar();
-
         // Add equal spacing between CardViews in the RecyclerView
-        int spacing = Math.round(getResources().getDimension(R.dimen.material_card_view_padding));
+        final int spacing = Math.round(getResources().getDimension(R.dimen.material_card_view_padding));
         mCardsView.addItemDecoration(new EqualSpacingItemDecoration(spacing));
 
         // Swipe gestures

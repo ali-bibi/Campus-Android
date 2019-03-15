@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.tum.`in`.tumcampusapp.R
@@ -13,8 +14,10 @@ import de.tum.`in`.tumcampusapp.component.other.generic.activity.ActivityForDown
 import de.tum.`in`.tumcampusapp.component.other.generic.adapter.EqualSpacingItemDecoration
 import de.tum.`in`.tumcampusapp.component.ui.news.di.NewsModule
 import de.tum.`in`.tumcampusapp.service.DownloadWorker
+import de.tum.`in`.tumcampusapp.utils.Const
 import de.tum.`in`.tumcampusapp.utils.NetUtils
 import de.tum.`in`.tumcampusapp.utils.Utils
+import de.tum.`in`.tumcampusapp.utils.onScrolled
 import javax.inject.Inject
 
 /**
@@ -24,7 +27,14 @@ class NewsActivity : ActivityForDownloadingExternal(
         R.layout.activity_news
 ), DialogInterface.OnMultiChoiceClickListener {
 
-    private val recyclerView by lazy { findViewById<RecyclerView>(R.id.activity_news_list_view) }
+    private val toolbar: Toolbar by lazy {
+        findViewById<Toolbar>(R.id.toolbar)
+    }
+
+    private val recyclerView: RecyclerView by lazy {
+        findViewById<RecyclerView>(R.id.activity_news_list_view)
+    }
+
     private var state = -1
 
     @Inject
@@ -52,6 +62,9 @@ class NewsActivity : ActivityForDownloadingExternal(
 
         val spacing = Math.round(resources.getDimension(R.dimen.material_card_view_padding))
         recyclerView.addItemDecoration(EqualSpacingItemDecoration(spacing))
+        recyclerView.onScrolled {
+            toolbar.isSelected = it.canScrollVertically(Const.SCROLL_DIRECTION_UP)
+        }
     }
 
     override fun onStart() {
