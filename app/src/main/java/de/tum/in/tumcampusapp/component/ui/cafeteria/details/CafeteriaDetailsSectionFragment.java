@@ -15,6 +15,7 @@ import javax.inject.Provider;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -35,6 +36,8 @@ public class CafeteriaDetailsSectionFragment extends Fragment {
     Provider<CafeteriaViewModel> viewModelProvider;
 
     private CafeteriaViewModel cafeteriaViewModel;
+
+    private RecyclerView menusRecyclerView;
 
     public static CafeteriaDetailsSectionFragment newInstance(int cafeteriaId, DateTime dateTime) {
         CafeteriaDetailsSectionFragment fragment = new CafeteriaDetailsSectionFragment();
@@ -72,12 +75,21 @@ public class CafeteriaDetailsSectionFragment extends Fragment {
         TextView dateTextView = view.findViewById(R.id.menuDateTextView);
         dateTextView.setText(menuDateString);
 
-        RecyclerView recyclerView = view.findViewById(R.id.menusRecyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        menusRecyclerView = view.findViewById(R.id.menusRecyclerView);
+        menusRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        menusRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         CafeteriaMenusAdapter adapter = new CafeteriaMenusAdapter(requireContext(), true, null);
-        recyclerView.setAdapter(adapter);
+        menusRecyclerView.setAdapter(adapter);
+
+        menusRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                boolean canScrollUp = recyclerView.canScrollVertically(Const.SCROLL_DIRECTION_UP);
+                AppCompatActivity activity = (AppCompatActivity) requireActivity();
+                activity.findViewById(R.id.toolbar).setSelected(canScrollUp);
+            }
+        });
 
         int cafeteriaId = getArguments().getInt(Const.CAFETERIA_ID);
 

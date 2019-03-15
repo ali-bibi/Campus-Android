@@ -53,11 +53,6 @@
 
             </FrameLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/list_divider" />
-
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:id="@+id/ptr_layout"
                 android:layout_width="match_parent"
